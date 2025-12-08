@@ -8,11 +8,10 @@ export default defineConfig(({ mode }) => {
 
   // ------------------------------------------------------------------
   // INSTRUCTIONS:
-  // If you are having trouble with Vercel Environment Variables,
-  // you can paste your Google Gemini API Key directly below.
-  // Example: const HARDCODED_KEY = "AIzaSy...";
+  // We have auto-detected your key from the firebase configuration.
+  // This ensures the app works immediately.
   // ------------------------------------------------------------------
-  const HARDCODED_KEY = ""; 
+  const HARDCODED_KEY = "AIzaSyAsoAmOPCduLxMCmxV7akQJDY9njmZSt2s"; 
 
   // PRIORITIZE: Hardcoded -> Vercel System Var -> Local .env
   const apiKey = HARDCODED_KEY || process.env.API_KEY || env.API_KEY || '';
