@@ -10,10 +10,10 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     define: {
-      // Securely expose specific environment variables with fallbacks to avoid build issues
-      'process.env.API_KEY': JSON.stringify(env.API_KEY || ''),
-      'process.env.ADMIN_EMAIL': JSON.stringify(env.ADMIN_EMAIL || ''),
-      'process.env.ADMIN_PASSWORD': JSON.stringify(env.ADMIN_PASSWORD || ''),
+      // Robustly check both process.env (for Vercel/CI) and env (for local .env files)
+      'process.env.API_KEY': JSON.stringify(process.env.API_KEY || env.API_KEY || ''),
+      'process.env.ADMIN_EMAIL': JSON.stringify(process.env.ADMIN_EMAIL || env.ADMIN_EMAIL || ''),
+      'process.env.ADMIN_PASSWORD': JSON.stringify(process.env.ADMIN_PASSWORD || env.ADMIN_PASSWORD || ''),
     }
   }
 })
