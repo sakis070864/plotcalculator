@@ -1,12 +1,21 @@
 import { GoogleGenAI } from "@google/genai";
 import { ProjectInputs, CalculationResults } from "../types";
 
+// Helper to validate key
+const getClient = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey || apiKey.length === 0 || apiKey === 'undefined') {
+    throw new Error("Configuration Error: Google Gemini API Key is missing. Please add 'API_KEY' to your Vercel Environment Variables and Redeploy.");
+  }
+  return new GoogleGenAI({ apiKey });
+};
+
 export const analyzeInvestment = async (
   inputs: ProjectInputs,
   results: CalculationResults
 ): Promise<string> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = getClient();
     const prompt = `
       Act as a senior real estate development consultant specializing in the Greek market.
       Analyze the following residential development scenario:
@@ -60,7 +69,7 @@ export const estimatePlotPrice = async (
   plotSize: number
 ): Promise<number> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = getClient();
     const prompt = `
       You are a real estate valuation expert for the Greek market.
       
@@ -98,7 +107,7 @@ export const generateDesignVisualization = async (
   prompt: string
 ): Promise<string> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = getClient();
     // Strip header if present
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     
