@@ -1,20 +1,42 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Domos - Greek Property Calculator
 
-# Run and deploy your AI Studio app
+A comprehensive real estate development calculator for estimating construction costs, revenue, and profit margins for building houses in Greece. This application features AI-powered investment analysis using Google Gemini and plot visualization.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/drive/1AcCLjd5cRV4WL_AVej5ybb3OBleX_nO3
+*   **Financial Analysis**: Calculate construction costs, taxes, and potential profit margins.
+*   **AI Consultant**: Get instant feasibility reports on your project using Google Gemini AI.
+*   **Design Studio**: Visualise changes to a plot using AI image generation.
+*   **Project Management**: Save and manage multiple development scenarios.
 
-## Run Locally
+## Deployment to Vercel
 
-**Prerequisites:**  Node.js
+This project is configured for seamless deployment on Vercel.
 
+### Environment Variables
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+For security, you should configure the following environment variables in your Vercel Project Settings:
+
+| Variable | Description |
+|----------|-------------|
+| `API_KEY` | **Required**. Your Google Gemini API Key. |
+| `ADMIN_EMAIL` | Optional. Email for the login screen. Defaults to `sakis@post.com`. |
+| `ADMIN_PASSWORD` | Optional. Password for the login screen. Defaults to `sakis1964`. |
+
+### Build Command
+Vercel should automatically detect the framework, but if needed:
+*   **Build Command**: `npm run build`
+*   **Output Directory**: `dist`
+*   **Install Command**: `npm install`
+
+## Local Development
+
+1.  Clone the repository.
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Start the development server:
+    ```bash
+    npm run dev
+    ```
