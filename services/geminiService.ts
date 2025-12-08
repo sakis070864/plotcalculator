@@ -60,6 +60,13 @@ export const analyzeInvestment = async (
     return response.text || "No analysis generated.";
   } catch (error: any) {
     console.error("Gemini API Error:", error);
+    
+    // Check for "Service Disabled" error (403)
+    const errorMsg = error.message || JSON.stringify(error);
+    if (errorMsg.includes("Generative Language API has not been used") || errorMsg.includes("SERVICE_DISABLED")) {
+      throw new Error("ENABLE_API_REQUIRED");
+    }
+
     throw new Error(error.message || "Failed to generate AI analysis.");
   }
 };
@@ -98,6 +105,13 @@ export const estimatePlotPrice = async (
     return price;
   } catch (error: any) {
     console.error("Gemini Price Estimation Error:", error);
+    
+    // Check for "Service Disabled" error (403)
+    const errorMsg = error.message || JSON.stringify(error);
+    if (errorMsg.includes("Generative Language API has not been used") || errorMsg.includes("SERVICE_DISABLED")) {
+      throw new Error("ENABLE_API_REQUIRED");
+    }
+
     throw new Error(error.message || "Failed to estimate price.");
   }
 };
@@ -139,6 +153,13 @@ export const generateDesignVisualization = async (
     throw new Error("No image generated in response");
   } catch (error: any) {
     console.error("Gemini Image API Error:", error);
+
+    // Check for "Service Disabled" error (403)
+    const errorMsg = error.message || JSON.stringify(error);
+    if (errorMsg.includes("Generative Language API has not been used") || errorMsg.includes("SERVICE_DISABLED")) {
+      throw new Error("ENABLE_API_REQUIRED");
+    }
+
     throw new Error(error.message || "Failed to generate design.");
   }
 };

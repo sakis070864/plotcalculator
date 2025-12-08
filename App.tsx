@@ -36,7 +36,8 @@ import {
   Copy,
   Lock,
   LogOut,
-  ArrowRight
+  ArrowRight,
+  ExternalLink
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -575,9 +576,14 @@ const App: React.FC = () => {
         handleInputChange('plotPrice', estimatedPrice);
         setNotification({ message: "Price estimated successfully", type: 'success' });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to estimate price", error);
-      setNotification({ message: "Could not estimate price", type: 'error' });
+      if (error.message === "ENABLE_API_REQUIRED") {
+        setNotification({ message: "API Service Disabled. See Analysis section.", type: 'error' });
+        setAiState(prev => ({ ...prev, error: "ENABLE_API_REQUIRED" }));
+      } else {
+        setNotification({ message: "Could not estimate price", type: 'error' });
+      }
     } finally {
       setIsEstimatingPrice(false);
     }
@@ -621,11 +627,19 @@ const App: React.FC = () => {
         generatedImage: resultImage 
       }));
     } catch (err: any) {
+      const errorMsg = err.message === "ENABLE_API_REQUIRED" 
+        ? "API Service Disabled. See Analysis section." 
+        : "Failed to generate design: " + err.message;
+      
       setDesignState(prev => ({ 
         ...prev, 
         loading: false, 
-        error: "Failed to generate design: " + err.message 
+        error: errorMsg 
       }));
+      
+      if (err.message === "ENABLE_API_REQUIRED") {
+        setAiState(prev => ({ ...prev, error: "ENABLE_API_REQUIRED" }));
+      }
     }
   };
 
@@ -1267,7 +1281,11 @@ const App: React.FC = () => {
                             )}
                          </button>
                          {designState.error && (
-                           <div className="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-100 dark:border-red-800">
+                           <div className={`text-sm p-3 rounded-lg border flex flex-col gap-2 ${
+                              designState.error.includes("Analysis section") 
+                              ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                              : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800"
+                           }`}>
                              {designState.error}
                            </div>
                          )}
@@ -1325,7 +1343,30 @@ const App: React.FC = () => {
                  </button>
                </div>
 
-               {aiState.error && (
+               {aiState.error === "ENABLE_API_REQUIRED" ? (
+                 <div className="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-xl border border-amber-200 dark:border-amber-800 animate-in fade-in slide-in-from-bottom-2">
+                    <div className="flex items-start gap-3">
+                       <div className="p-2 bg-amber-100 dark:bg-amber-800/50 rounded-full text-amber-700 dark:text-amber-400">
+                         <Lock size={20} />
+                       </div>
+                       <div>
+                          <h4 className="font-bold text-amber-900 dark:text-amber-100">API Service Not Enabled</h4>
+                          <p className="text-sm text-amber-800 dark:text-amber-300 mt-1 mb-3">
+                             The "Generative Language API" is currently disabled in your Google Cloud Project (ID: 802024199226). You must enable it to use AI features.
+                          </p>
+                          <a 
+                            href="https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=802024199226"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-lg transition-colors shadow-sm"
+                          >
+                            Enable API in Google Cloud
+                            <ExternalLink size={14} />
+                          </a>
+                       </div>
+                    </div>
+                 </div>
+               ) : aiState.error && (
                  <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-3 rounded-lg text-sm border border-red-100 dark:border-red-800">
                    {aiState.error}
                  </div>
