@@ -1373,18 +1373,24 @@ const App: React.FC = () => {
                           <ShieldAlert size={20} />
                         </div>
                         <div>
-                           <h4 className="font-bold text-red-900 dark:text-red-100">API Key Restricted</h4>
+                           <h4 className="font-bold text-red-900 dark:text-red-100">API Key Missing Permissions</h4>
                            <p className="text-sm text-red-800 dark:text-red-300 mt-1 mb-3">
-                              Your API Key has security restrictions that block the AI service. 
-                              Go to <strong>Credentials</strong>, edit your API Key, and add "Generative Language API" to the allowed list (or select "Don't restrict key").
+                              You are using the <strong>"Browser key (auto created by Firebase)"</strong> but it is blocking the AI service.
                            </p>
+                           <ol className="list-decimal list-inside text-sm text-red-800 dark:text-red-300 mb-3 space-y-1">
+                              <li>Click the button below to open Credentials.</li>
+                              <li>Click on the name <strong>"Browser key (auto created by Firebase)"</strong>.</li>
+                              <li>Scroll down to <strong>"API restrictions"</strong>.</li>
+                              <li>In the dropdown, select <strong>"Generative Language API"</strong> and check the box.</li>
+                              <li>Click <strong>OK</strong> and then <strong>SAVE</strong>.</li>
+                           </ol>
                            <a 
                              href="https://console.cloud.google.com/apis/credentials?project=802024199226"
                              target="_blank"
                              rel="noopener noreferrer"
                              className="inline-flex items-center gap-2 px-4 py-2 bg-red-700 hover:bg-red-800 text-white text-sm font-bold rounded-lg transition-colors shadow-sm"
                            >
-                             Fix Key Restrictions
+                             Fix Key Permissions
                              <ExternalLink size={14} />
                            </a>
                         </div>
