@@ -31,6 +31,20 @@ export default defineConfig(({ mode }) => {
       'process.env.API_KEY': JSON.stringify(apiKey),
       'process.env.ADMIN_EMAIL': JSON.stringify(adminEmail),
       'process.env.ADMIN_PASSWORD': JSON.stringify(adminPassword),
+    },
+    build: {
+      chunkSizeWarningLimit: 1000, // Increase limit to 1MB to suppress warnings
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Split external libraries into separate chunks for better caching and smaller main bundle
+            vendor: ['react', 'react-dom', 'lucide-react'],
+            firebase: ['firebase/app', 'firebase/firestore'],
+            charts: ['recharts'],
+            ai: ['@google/genai']
+          }
+        }
+      }
     }
   }
 })
