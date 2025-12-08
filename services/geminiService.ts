@@ -61,10 +61,16 @@ export const analyzeInvestment = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     
-    // Check for "Service Disabled" error (403)
     const errorMsg = error.message || JSON.stringify(error);
+    
+    // Check for "Service Disabled" (Project level issue)
     if (errorMsg.includes("Generative Language API has not been used") || errorMsg.includes("SERVICE_DISABLED")) {
       throw new Error("ENABLE_API_REQUIRED");
+    }
+
+    // Check for "Key Blocked" (Key level issue)
+    if (errorMsg.includes("API_KEY_SERVICE_BLOCKED")) {
+      throw new Error("API_KEY_RESTRICTED");
     }
 
     throw new Error(error.message || "Failed to generate AI analysis.");
@@ -106,10 +112,14 @@ export const estimatePlotPrice = async (
   } catch (error: any) {
     console.error("Gemini Price Estimation Error:", error);
     
-    // Check for "Service Disabled" error (403)
     const errorMsg = error.message || JSON.stringify(error);
+
     if (errorMsg.includes("Generative Language API has not been used") || errorMsg.includes("SERVICE_DISABLED")) {
       throw new Error("ENABLE_API_REQUIRED");
+    }
+
+    if (errorMsg.includes("API_KEY_SERVICE_BLOCKED")) {
+      throw new Error("API_KEY_RESTRICTED");
     }
 
     throw new Error(error.message || "Failed to estimate price.");
@@ -154,10 +164,14 @@ export const generateDesignVisualization = async (
   } catch (error: any) {
     console.error("Gemini Image API Error:", error);
 
-    // Check for "Service Disabled" error (403)
     const errorMsg = error.message || JSON.stringify(error);
+
     if (errorMsg.includes("Generative Language API has not been used") || errorMsg.includes("SERVICE_DISABLED")) {
       throw new Error("ENABLE_API_REQUIRED");
+    }
+
+    if (errorMsg.includes("API_KEY_SERVICE_BLOCKED")) {
+      throw new Error("API_KEY_RESTRICTED");
     }
 
     throw new Error(error.message || "Failed to generate design.");

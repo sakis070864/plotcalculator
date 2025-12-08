@@ -37,7 +37,8 @@ import {
   Lock,
   LogOut,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  ShieldAlert
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -578,9 +579,9 @@ const App: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Failed to estimate price", error);
-      if (error.message === "ENABLE_API_REQUIRED") {
-        setNotification({ message: "API Service Disabled. See Analysis section.", type: 'error' });
-        setAiState(prev => ({ ...prev, error: "ENABLE_API_REQUIRED" }));
+      if (error.message === "ENABLE_API_REQUIRED" || error.message === "API_KEY_RESTRICTED") {
+        setNotification({ message: "API Service Blocked. See Analysis section.", type: 'error' });
+        setAiState(prev => ({ ...prev, error: error.message }));
       } else {
         setNotification({ message: "Could not estimate price", type: 'error' });
       }
@@ -627,19 +628,18 @@ const App: React.FC = () => {
         generatedImage: resultImage 
       }));
     } catch (err: any) {
-      const errorMsg = err.message === "ENABLE_API_REQUIRED" 
-        ? "API Service Disabled. See Analysis section." 
-        : "Failed to generate design: " + err.message;
+      let errorMsg = "Failed to generate design: " + err.message;
+
+      if (err.message === "ENABLE_API_REQUIRED" || err.message === "API_KEY_RESTRICTED") {
+         errorMsg = "API Service Blocked. See Analysis section.";
+         setAiState(prev => ({ ...prev, error: err.message }));
+      }
       
       setDesignState(prev => ({ 
         ...prev, 
         loading: false, 
         error: errorMsg 
       }));
-      
-      if (err.message === "ENABLE_API_REQUIRED") {
-        setAiState(prev => ({ ...prev, error: "ENABLE_API_REQUIRED" }));
-      }
     }
   };
 
@@ -1352,7 +1352,7 @@ const App: React.FC = () => {
                        <div>
                           <h4 className="font-bold text-amber-900 dark:text-amber-100">API Service Not Enabled</h4>
                           <p className="text-sm text-amber-800 dark:text-amber-300 mt-1 mb-3">
-                             The "Generative Language API" is currently disabled in your Google Cloud Project (ID: 802024199226). You must enable it to use AI features.
+                             The "Generative Language API" is currently disabled in your Google Cloud Project. You must enable it to use AI features.
                           </p>
                           <a 
                             href="https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=802024199226"
@@ -1366,6 +1366,30 @@ const App: React.FC = () => {
                        </div>
                     </div>
                  </div>
+               ) : aiState.error === "API_KEY_RESTRICTED" ? (
+                  <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-bottom-2">
+                     <div className="flex items-start gap-3">
+                        <div className="p-2 bg-red-100 dark:bg-red-800/50 rounded-full text-red-700 dark:text-red-400">
+                          <ShieldAlert size={20} />
+                        </div>
+                        <div>
+                           <h4 className="font-bold text-red-900 dark:text-red-100">API Key Restricted</h4>
+                           <p className="text-sm text-red-800 dark:text-red-300 mt-1 mb-3">
+                              Your API Key has security restrictions that block the AI service. 
+                              Go to <strong>Credentials</strong>, edit your API Key, and add "Generative Language API" to the allowed list (or select "Don't restrict key").
+                           </p>
+                           <a 
+                             href="https://console.cloud.google.com/apis/credentials?project=802024199226"
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             className="inline-flex items-center gap-2 px-4 py-2 bg-red-700 hover:bg-red-800 text-white text-sm font-bold rounded-lg transition-colors shadow-sm"
+                           >
+                             Fix Key Restrictions
+                             <ExternalLink size={14} />
+                           </a>
+                        </div>
+                     </div>
+                  </div>
                ) : aiState.error && (
                  <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-3 rounded-lg text-sm border border-red-100 dark:border-red-800">
                    {aiState.error}
