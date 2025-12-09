@@ -33,7 +33,8 @@ import {
   ArrowRight,
   ExternalLink,
   ShieldAlert,
-  Printer
+  Printer,
+  LucideIcon
 } from 'lucide-react';
 import { 
   ResponsiveContainer,
@@ -313,16 +314,28 @@ const RiskBar = ({ margin }: { margin: number }) => {
   );
 };
 
-const ProgressRing = ({ percentage, label, colorClass, trailColorClass = "text-slate-100 dark:text-slate-700" }: { percentage: number, label: string, colorClass: string, trailColorClass?: string }) => {
-  const radius = 42; // Increased from 28
-  const stroke = 8;  // Increased from 6
+const ProgressRing = ({ 
+  percentage, 
+  label, 
+  colorClass, 
+  icon: Icon, 
+  trailColorClass = "text-slate-100 dark:text-slate-700" 
+}: { 
+  percentage: number, 
+  label: string, 
+  colorClass: string, 
+  icon?: LucideIcon, 
+  trailColorClass?: string 
+}) => {
+  const radius = 36;
+  const stroke = 8;
   const normalizedRadius = radius - stroke * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative flex items-center justify-center">
+    <div className="flex flex-col items-center justify-center w-full h-full">
+      <div className="relative flex items-center justify-center mb-1">
         <svg
           height={radius * 2}
           width={radius * 2}
@@ -352,11 +365,14 @@ const ProgressRing = ({ percentage, label, colorClass, trailColorClass = "text-s
             className={`${colorClass} transition-all duration-1000 ease-out`}
           />
         </svg>
-        <span className="absolute text-xl font-bold text-slate-700 dark:text-white">
-          {percentage}%
-        </span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          {Icon && <Icon size={16} className="text-slate-400 dark:text-slate-500 mb-0.5" />}
+          <span className="text-xl font-bold text-slate-700 dark:text-white leading-none">
+            {percentage}%
+          </span>
+        </div>
       </div>
-      <span className="mt-3 text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</span>
+      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</span>
     </div>
   );
 };
@@ -975,22 +991,33 @@ const App: React.FC = () => {
                        {/* Right Column: Expense Breakdown Only */}
                        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700 flex flex-col justify-between">
                            <h4 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2"><Layers size={14}/> Expense Breakdown</h4>
-                           <div className="flex items-center justify-around h-full">
-                               <ProgressRing 
-                                  percentage={plotPct} 
-                                  label="Plot" 
-                                  colorClass="text-blue-900 dark:text-blue-500"
-                               />
-                               <ProgressRing 
-                                  percentage={constrPct} 
-                                  label="Construction" 
-                                  colorClass="text-blue-600 dark:text-blue-400"
-                               />
-                               <ProgressRing 
-                                  percentage={softPct} 
-                                  label="Soft Costs" 
-                                  colorClass="text-slate-400 dark:text-slate-500"
-                               />
+                           
+                           {/* Updated Grid Layout for Cards */}
+                           <div className="grid grid-cols-3 gap-3 h-full">
+                               <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-3 flex flex-col items-center justify-center shadow-sm">
+                                   <ProgressRing 
+                                      percentage={plotPct} 
+                                      label="Plot" 
+                                      colorClass="text-blue-900 dark:text-blue-500"
+                                      icon={MapIcon}
+                                   />
+                               </div>
+                               <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-3 flex flex-col items-center justify-center shadow-sm">
+                                   <ProgressRing 
+                                      percentage={constrPct} 
+                                      label="Construction" 
+                                      colorClass="text-blue-600 dark:text-blue-400"
+                                      icon={Hammer}
+                                   />
+                               </div>
+                               <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-3 flex flex-col items-center justify-center shadow-sm">
+                                   <ProgressRing 
+                                      percentage={softPct} 
+                                      label="Soft Costs" 
+                                      colorClass="text-slate-400 dark:text-slate-500"
+                                      icon={Wallet}
+                                   />
+                               </div>
                            </div>
                         </div>
                     </div>
