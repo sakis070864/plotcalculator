@@ -327,15 +327,15 @@ const ProgressRing = ({
   icon?: LucideIcon, 
   trailColorClass?: string 
 }) => {
-  const radius = 36;
-  const stroke = 8;
+  const radius = 55; // MUCH BIGGER
+  const stroke = 10; // Thicker stroke
   const normalizedRadius = radius - stroke * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
-      <div className="relative flex items-center justify-center mb-1">
+    <div className="flex flex-col items-center justify-center w-full h-full py-2">
+      <div className="relative flex items-center justify-center mb-3">
         <svg
           height={radius * 2}
           width={radius * 2}
@@ -366,13 +366,13 @@ const ProgressRing = ({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          {Icon && <Icon size={16} className="text-slate-400 dark:text-slate-500 mb-0.5" />}
-          <span className="text-xl font-bold text-slate-700 dark:text-white leading-none">
+          {Icon && <Icon size={24} className="text-slate-400 dark:text-slate-500 mb-1" />}
+          <span className="text-3xl font-bold text-slate-700 dark:text-white leading-none">
             {percentage}%
           </span>
         </div>
       </div>
-      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</span>
+      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</span>
     </div>
   );
 };
