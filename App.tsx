@@ -40,7 +40,12 @@ import {
   Cell,
   PieChart,
   Pie,
-  Tooltip
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid
 } from 'recharts';
 
 import { ProjectInputs, CalculationResults, AIAnalysisState, DesignState, SavedProject } from './types';
@@ -647,6 +652,18 @@ const App: React.FC = () => {
   const constrPct = Math.round((results.constructionCostTotal / results.constructionCostTotalInclPlot) * 100);
   const softPct = Math.round((results.miscCostsValue / results.constructionCostTotalInclPlot) * 100);
 
+  // Revenue Chart Data
+  const revenueData = [
+    { name: 'Total Cost', value: results.constructionCostTotalInclPlot },
+    { name: 'Revenue', value: results.revenueTotal },
+  ];
+
+  const costBreakdownData = [
+    { name: 'Plot', value: inputs.plotPrice, color: isDarkMode ? '#3b82f6' : '#1e3a8a' }, 
+    { name: 'Construction', value: results.constructionCostTotal, color: isDarkMode ? '#0ea5e9' : '#2563eb' }, 
+    { name: 'Misc/Tax', value: results.miscCostsValue, color: isDarkMode ? '#94a3b8' : '#64748b' }, 
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 pb-12 transition-colors duration-200 relative">
       
@@ -947,19 +964,18 @@ const App: React.FC = () => {
                   </div>
                   
                   {/* Visual Analysis Main Content */}
-                  <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                     {/* Left Visual: Gauge */}
-                     <div className="h-full">
-                        <StrengthGauge margin={results.profitMargin} />
-                     </div>
-                     
-                     {/* Right Visual: Stacked Layout to Prevent Overlap */}
-                     <div className="flex flex-col justify-between gap-6">
-                        
-                        {/* 1. Expense Breakdown (Progress Rings) */}
-                        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                       {/* Left Column: Gauge + Risk Bar */}
+                       <div className="flex flex-col gap-6">
+                          <StrengthGauge margin={results.profitMargin} />
+                          <RiskBar margin={results.profitMargin} />
+                       </div>
+                       
+                       {/* Right Column: Expense Breakdown Only */}
+                       <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700 flex flex-col justify-between">
                            <h4 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2"><Layers size={14}/> Expense Breakdown</h4>
-                           <div className="flex items-center justify-around">
+                           <div className="flex items-center justify-around h-full">
                                <ProgressRing 
                                   percentage={plotPct} 
                                   label="Plot" 
@@ -977,57 +993,59 @@ const App: React.FC = () => {
                                />
                            </div>
                         </div>
+                    </div>
 
-                        {/* 2. Risk Bar */}
-                        <RiskBar margin={results.profitMargin} />
+                    {/* Full Width Break-even Bar */}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50 mb-6">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">Break-even Price</span>
+                          <span className="text-sm font-bold text-blue-900 dark:text-blue-300">{formatCurrency(results.costPerSqmInclPlot)} /m²</span>
+                        </div>
+                        <div className="h-3 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-blue-900 dark:bg-blue-400" style={{ width: `${Math.min((results.costPerSqmInclPlot / inputs.salePricePerSqm) * 100, 100)}%` }}></div>
+                        </div>
+                        <div className="text-right mt-1">
+                          <span className="text-xs text-blue-600 dark:text-blue-400">Current margin safety: {results.profitMargin.toFixed(1)}%</span>
+                        </div>
+                    </div>
 
-                        {/* 3. Break-even Bar */}
-                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">Break-even Price</span>
-                              <span className="text-sm font-bold text-blue-900 dark:text-blue-300">{formatCurrency(results.costPerSqmInclPlot)} /m²</span>
+                    {/* Revenue Chart */}
+                    <div className="px-0 pt-2">
+                        <h4 className="text-xs font-bold text-slate-500 uppercase mb-4">Revenue vs Investment</h4>
+                        <div className="space-y-4">
+                            <div>
+                                <div className="flex justify-between text-xs mb-1">
+                                  <span className="font-medium text-slate-500">Total Cost</span>
+                                </div>
+                                <div className="h-8 bg-slate-500 rounded-md relative flex items-center px-3 text-white text-xs font-bold" style={{ width: `${Math.min((results.constructionCostTotalInclPlot / results.revenueTotal) * 100, 100)}%` }}></div>
                             </div>
-                            <div className="h-3 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
-                              <div className="h-full bg-blue-900 dark:bg-blue-400" style={{ width: '60%' }}></div>
-                            </div>
-                            <div className="text-right mt-1">
-                              <span className="text-xs text-blue-600 dark:text-blue-400">Current margin safety: {results.profitMargin.toFixed(1)}%</span>
+                            <div>
+                                <div className="flex justify-between text-xs mb-1">
+                                  <span className="font-medium text-slate-500">Revenue</span>
+                                </div>
+                                <div className="h-8 bg-emerald-500 rounded-md relative flex items-center px-3 text-white text-xs font-bold" style={{ width: '100%' }}></div>
                             </div>
                         </div>
-                     </div>
-                  </div>
-
-                  {/* Simple Bar Chart */}
-                  <div className="px-6 pb-6 pt-0">
-                      <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Revenue vs Investment</h4>
-                      <div className="space-y-3">
-                          <div>
-                              <span className="text-xs font-medium text-slate-500 mb-1 block">Total Cost</span>
-                              <div className="h-8 bg-slate-500 rounded-md relative flex items-center px-3 text-white text-xs font-bold" style={{ width: '65%' }}></div>
-                          </div>
-                          <div>
-                              <span className="text-xs font-medium text-slate-500 mb-1 block">Revenue</span>
-                              <div className="h-8 bg-emerald-500 rounded-md relative flex items-center px-3 text-white text-xs font-bold" style={{ width: '100%' }}></div>
-                          </div>
-                      </div>
-                      <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-                          <div className="text-center">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase">Constr. Cost</p>
-                              <p className="font-bold text-slate-800 dark:text-white">{formatNumber(results.constructionCostTotal)}</p>
-                          </div>
-                          <div className="text-center">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase">Total Cost/m²</p>
-                              <p className="font-bold text-slate-800 dark:text-white">{formatNumber(results.costPerSqmInclPlot)}</p>
-                          </div>
-                          <div className="text-center">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase">ROI</p>
-                              <p className="font-bold text-emerald-600">{results.roi.toFixed(1)}%</p>
-                          </div>
-                          <div className="text-center">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase">Margin</p>
-                              <p className="font-bold text-emerald-600">{results.profitMargin.toFixed(1)}%</p>
-                          </div>
-                      </div>
+                        
+                        <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-700">
+                            <div className="text-center">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase">Constr. Cost</p>
+                                <p className="font-bold text-slate-800 dark:text-white">{formatNumber(results.constructionCostTotal)}</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase">Total Cost/m²</p>
+                                <p className="font-bold text-slate-800 dark:text-white">{formatNumber(results.costPerSqmInclPlot)}</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase">ROI</p>
+                                <p className="font-bold text-emerald-600">{results.roi.toFixed(1)}%</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase">Margin</p>
+                                <p className="font-bold text-emerald-600">{results.profitMargin.toFixed(1)}%</p>
+                            </div>
+                        </div>
+                    </div>
                   </div>
                 </div>
 
