@@ -314,8 +314,8 @@ const RiskBar = ({ margin }: { margin: number }) => {
 };
 
 const ProgressRing = ({ percentage, label, colorClass, trailColorClass = "text-slate-100 dark:text-slate-700" }: { percentage: number, label: string, colorClass: string, trailColorClass?: string }) => {
-  const radius = 28;
-  const stroke = 6;
+  const radius = 42; // Increased from 28
+  const stroke = 8;  // Increased from 6
   const normalizedRadius = radius - stroke * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
@@ -352,11 +352,11 @@ const ProgressRing = ({ percentage, label, colorClass, trailColorClass = "text-s
             className={`${colorClass} transition-all duration-1000 ease-out`}
           />
         </svg>
-        <span className="absolute text-xs font-bold text-slate-700 dark:text-white">
+        <span className="absolute text-xl font-bold text-slate-700 dark:text-white">
           {percentage}%
         </span>
       </div>
-      <span className="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+      <span className="mt-3 text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</span>
     </div>
   );
 };
