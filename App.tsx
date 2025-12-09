@@ -68,7 +68,7 @@ const NotificationBanner = ({ message, type, onClose }: { message: string, type:
   }, [onClose]);
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border transition-all animate-in slide-in-from-bottom-5 fade-in ${
+    <div className={`fixed bottom-4 right-4 z-[300] flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border transition-all animate-in slide-in-from-bottom-5 fade-in ${
       type === 'success' 
         ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/90 dark:border-emerald-800 dark:text-emerald-100' 
         : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/90 dark:border-red-800 dark:text-red-100'
@@ -554,6 +554,7 @@ const App: React.FC = () => {
   };
 
   const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
     e.stopPropagation();
     setDeleteConfirmationId(id);
   };
@@ -796,8 +797,8 @@ const App: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmationId && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border-2 border-red-100 dark:border-red-900/50">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border-2 border-red-100 dark:border-red-900/50">
             <div className="p-6">
               <div className="flex flex-col items-center text-center mb-6">
                 <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4 text-red-600 dark:text-red-500">
@@ -842,760 +843,605 @@ const App: React.FC = () => {
 
       {/* Header */}
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-20 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-blue-900 dark:bg-blue-700 p-2 rounded-lg text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-900 text-white p-2 rounded-lg">
               <Building2 size={24} />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-blue-950 dark:text-white">Domos <span className="text-slate-400 dark:text-slate-500 font-normal">| Greece</span></h1>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Domos</h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Development Calculator</p>
+            </div>
           </div>
-          <div className="flex gap-4">
-             <button
-               onClick={handleOpenSaveModal}
-               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 dark:bg-blue-600 hover:bg-blue-950 dark:hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
-               title="Save current project"
-             >
-               <Save size={16} />
-               <span className="hidden sm:inline">Save Project</span>
-             </button>
-             <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="flex items-center justify-center p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title="Toggle Dark Mode"
-             >
-                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-             </button>
-             <button 
-                onClick={handleLogout}
-                className="flex items-center justify-center p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title="Sign Out"
-             >
-                <LogOut size={20} />
-             </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              title="Toggle Theme"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+            <div className="flex items-center gap-2 mr-2">
+              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-800 dark:text-blue-200 font-bold text-xs">
+                S
+              </div>
+              <span className="text-sm font-medium hidden sm:block">Sakis</span>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="text-slate-400 hover:text-red-500 transition-colors"
+              title="Logout"
+            >
+              <LogOut size={20} />
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* LEFT COLUMN: INPUTS */}
-          <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold flex items-center gap-2 text-blue-950 dark:text-white">
-                  <MapIcon className="text-blue-900 dark:text-blue-400" size={20} />
-                  Plot Details
-                </h2>
-                <button 
-                  type="button"
-                  onClick={handleReset}
-                  className="p-2 text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                  title="Clear all fields"
-                >
-                  <RotateCcw size={16} />
-                </button>
-              </div>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* Navigation Tabs */}
+        <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-8 max-w-md mx-auto shadow-inner">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
+              activeTab === 'overview'
+                ? 'bg-white dark:bg-slate-700 text-blue-900 dark:text-white shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+            }`}
+          >
+            <Calculator size={16} />
+            Calculator
+          </button>
+          <button
+            onClick={() => setActiveTab('breakdown')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
+              activeTab === 'breakdown'
+                ? 'bg-white dark:bg-slate-700 text-blue-900 dark:text-white shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+            }`}
+          >
+            <FolderOpen size={16} />
+            Saved Projects
+          </button>
+          <button
+            onClick={() => setActiveTab('design')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
+              activeTab === 'design'
+                ? 'bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-300 shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-300'
+            }`}
+          >
+            <Sparkles size={16} />
+            AI Design
+          </button>
+        </div>
+
+        {activeTab === 'overview' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Left Column: Inputs */}
+            <div className="lg:col-span-4 space-y-6">
               
-              <div className="space-y-4">
-                {/* Location Input */}
-                <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-800 dark:hover:border-blue-500 transition-colors">
-                  <div className="flex items-center gap-2 mb-2 text-slate-600 dark:text-slate-400">
-                    <MapPin size={18} className="text-slate-400 dark:text-slate-500" />
-                    <label className="text-sm font-medium">Location / Area</label>
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <MapPin size={20} className="text-blue-600" />
+                    Project Details
+                  </h2>
+                  <div className="flex gap-2">
+                     <button onClick={handleReset} className="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" title="Reset Inputs">
+                       <RotateCcw size={18} />
+                     </button>
+                     <button onClick={handleOpenSaveModal} className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 rounded-lg transition-colors" title="Save Project">
+                       <Save size={18} />
+                     </button>
                   </div>
-                  <input
-                    type="text"
-                    value={inputs.location}
-                    onChange={(e) => handleInputChange('location', e.target.value)}
-                    className="w-full text-lg font-bold text-slate-900 dark:text-white bg-transparent outline-none placeholder:text-slate-300 dark:placeholder:text-slate-600"
-                    placeholder="e.g. Glyfada, Athens"
-                  />
                 </div>
 
-                {/* Owner Notes Input */}
-                <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-800 dark:hover:border-blue-500 transition-colors">
-                   <div className="flex items-center gap-2 mb-2 text-slate-600 dark:text-slate-400">
-                      <User size={18} className="text-slate-400 dark:text-slate-500" />
-                      <label className="text-sm font-medium">Owner Contact / Notes</label>
-                   </div>
-                   <textarea
-                      value={inputs.ownerNotes || ""}
-                      onChange={(e) => handleInputChange('ownerNotes', e.target.value)}
-                      className="w-full text-sm text-slate-700 dark:text-slate-300 bg-transparent outline-none placeholder:text-slate-400 resize-none h-20"
-                      placeholder="Name, Phone, Comments..."
-                   />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-500 dark:text-slate-400">Location</label>
+                    <input 
+                      type="text" 
+                      value={inputs.location}
+                      onChange={(e) => handleInputChange('location', e.target.value)}
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium"
+                      placeholder="e.g. Glyfada, Athens"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                     <label className="text-sm font-medium text-slate-500 dark:text-slate-400">Owner/Notes</label>
+                     <textarea 
+                        value={inputs.ownerNotes || ''}
+                        onChange={(e) => handleInputChange('ownerNotes', e.target.value)}
+                        className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm min-h-[80px] resize-none"
+                        placeholder="Contact info, specific requirements..."
+                     />
+                  </div>
                 </div>
+              </div>
 
-                {/* Embedded Map */}
-                <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 h-48 bg-slate-100 dark:bg-slate-900 relative">
-                  {inputs.location ? (
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      style={{ border: 0, filter: isDarkMode ? 'invert(90%) hue-rotate(180deg)' : 'none' }}
-                      src={`https://maps.google.com/maps?q=${encodeURIComponent(inputs.location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-                      allowFullScreen
-                    ></iframe>
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-slate-400 text-sm">
-                      Enter a location to view map
-                    </div>
-                  )}
-                </div>
-
-                <div className="border-t border-slate-100 dark:border-slate-700 my-4"></div>
-
-                <InputCard 
+              <div className="space-y-4">
+                <InputCard
+                  label="Plot Size"
+                  value={inputs.plotSize}
+                  onChange={(val) => handleInputChange('plotSize', val)}
+                  icon={LandPlot}
+                  unit="m²"
+                  min={0}
+                  step={10}
+                />
+                
+                <InputCard
                   label="Plot Price"
                   value={inputs.plotPrice}
-                  onChange={(v) => handleInputChange('plotPrice', v)}
+                  onChange={(val) => handleInputChange('plotPrice', val)}
                   icon={Euro}
                   unit="EUR"
                   step={1000}
                   action={
                     <button 
                       onClick={handleEstimatePrice}
-                      disabled={isEstimatingPrice || !inputs.location}
-                      className="text-xs flex items-center gap-1 text-blue-900 dark:text-blue-300 hover:text-blue-950 dark:hover:text-blue-100 font-medium disabled:opacity-50 transition-colors bg-blue-100 dark:bg-blue-900/40 px-2 py-1 rounded-md"
-                      title="Estimate price based on location"
+                      disabled={isEstimatingPrice}
+                      className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors flex items-center gap-1"
                     >
-                      {isEstimatingPrice ? (
-                        <Sparkles size={12} className="animate-spin" />
-                      ) : (
-                        <Sparkles size={12} />
-                      )}
-                      {isEstimatingPrice ? "Estimating..." : "Auto-Estimate"}
+                      {isEstimatingPrice ? <div className="animate-spin w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full"></div> : <Wand2 size={12} />}
+                      Estimate
                     </button>
                   }
                 />
-                <InputCard 
-                  label="Plot Size"
-                  value={inputs.plotSize}
-                  onChange={(v) => handleInputChange('plotSize', v)}
-                  icon={LandPlot}
-                  unit="m²"
-                />
-                
-                {/* Building Coefficient Input */}
-                <InputCard 
-                  label="Building Coefficient (Factor)"
+
+                <InputCard
+                  label="Building Coefficient (Σ.Δ.)"
                   value={inputs.buildingCoefficient}
-                  onChange={(v) => handleInputChange('buildingCoefficient', v)}
+                  onChange={(val) => handleInputChange('buildingCoefficient', val)}
                   icon={Scale}
                   step={0.1}
                   min={0.1}
-                  max={5.0}
-                  helperText="Syntelesis Domisis (e.g. 0.8, 1.2)"
-                />
-
-                {/* Derived Max Buildable Area */}
-                <InputCard 
-                  label="Max Buildable Area (Calculated)"
-                  value={results.maxBuildableArea}
-                  icon={BrickWall}
-                  unit="m²"
-                  readOnly
-                  helperText={`${inputs.plotSize} m² x ${inputs.buildingCoefficient} Factor`}
+                  max={4.0}
+                  helperText={`Max Buildable: ${Math.round(results.maxBuildableArea)} m²`}
                   highlight
                 />
-              </div>
-            </div>
 
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 transition-colors">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-blue-950 dark:text-white">
-                <Calculator className="text-blue-900 dark:text-blue-400" size={20} />
-                Financials
-              </h2>
-              <div className="space-y-4">
-                <InputCard 
-                  label="Construction Cost (Hard)"
+                <InputCard
+                  label="Construction Cost"
                   value={inputs.constructionCostPerSqm}
-                  onChange={(v) => handleInputChange('constructionCostPerSqm', v)}
-                  icon={BrickWall}
+                  onChange={(val) => handleInputChange('constructionCostPerSqm', val)}
+                  icon={Hammer}
                   unit="€/m²"
-                  helperText="Excluding plot price"
+                  step={50}
                 />
-                <InputCard 
-                  label="Misc Costs Buffer"
-                  value={inputs.miscCostsPercent}
-                  onChange={(v) => handleInputChange('miscCostsPercent', v)}
-                  icon={PieIcon}
-                  unit="%"
-                  step={0.5}
-                  min={0}
-                  max={30}
-                  helperText="Taxes, notary, permits"
-                />
-                <div className="my-4 border-t border-slate-100 dark:border-slate-700"></div>
-                <InputCard 
-                  label="Target Sale Price"
+
+                <InputCard
+                  label="Est. Sale Price"
                   value={inputs.salePricePerSqm}
-                  onChange={(v) => handleInputChange('salePricePerSqm', v)}
-                  icon={TrendingUp}
+                  onChange={(val) => handleInputChange('salePricePerSqm', val)}
+                  icon={Wallet}
                   unit="€/m²"
-                  highlight
+                  step={50}
+                />
+                
+                <InputCard
+                    label="Misc Costs Buffer"
+                    value={inputs.miscCostsPercent}
+                    onChange={(val) => handleInputChange('miscCostsPercent', val)}
+                    icon={Layers}
+                    unit="%"
+                    step={1}
+                    max={20}
+                    helperText={`Taxes, notary, etc: ${formatCurrency(results.miscCostsValue)}`}
                 />
               </div>
             </div>
-          </div>
 
-          {/* RIGHT COLUMN: RESULTS */}
-          <div className="lg:col-span-8 space-y-6">
-            
-            {/* KPI Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <StatCard 
-                label="Total Investment" 
-                value={formatNumber(results.constructionCostTotalInclPlot)}
-                subValue={`Inc. Land & ${inputs.miscCostsPercent}% Misc`}
-                icon={Euro}
-                color="slate"
-              />
-               <StatCard 
-                label="Potential Revenue" 
-                value={formatNumber(results.revenueTotal)}
-                subValue={`@ ${formatCurrency(inputs.salePricePerSqm)} /m²`}
-                icon={TrendingUp}
-                color="blue"
-              />
-              <StatCard 
-                label="Net Profit" 
-                value={formatNumber(results.profitTotal)}
-                subValue={`${results.profitMargin.toFixed(1)}% Margin`}
-                icon={results.profitTotal >= 0 ? Sparkles : AlertCircle}
-                color={results.profitTotal >= 0 ? "green" : "amber"}
-              />
-            </div>
-
-            {/* Detailed Analysis Tabs */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden min-h-[500px] transition-colors">
-              <div className="border-b border-slate-100 dark:border-slate-700 px-6 pt-4 flex gap-6">
-                <button 
-                  onClick={() => setActiveTab('overview')}
-                  className={`pb-4 text-sm font-medium transition-colors border-b-2 ${
-                    activeTab === 'overview' 
-                      ? 'border-blue-900 text-blue-900 dark:text-blue-400 dark:border-blue-400' 
-                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                  }`}
-                >
-                  Visual Analysis
-                </button>
-                <button 
-                   onClick={() => setActiveTab('breakdown')}
-                   className={`pb-4 text-sm font-medium transition-colors border-b-2 ${
-                    activeTab === 'breakdown' 
-                      ? 'border-blue-900 text-blue-900 dark:text-blue-400 dark:border-blue-400' 
-                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                  }`}
-                >
-                  Cost Structure
-                </button>
-                <button 
-                   onClick={() => setActiveTab('design')}
-                   className={`pb-4 text-sm font-medium transition-colors border-b-2 flex items-center gap-1.5 ${
-                    activeTab === 'design' 
-                      ? 'border-indigo-900 text-indigo-900 dark:text-indigo-400 dark:border-indigo-400' 
-                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                  }`}
-                >
-                  <Wand2 size={16} />
-                  Design Studio
-                </button>
+            {/* Right Column: Results & Analysis */}
+            <div className="lg:col-span-8 space-y-6">
+              
+              {/* Key Stats Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard 
+                  label="Total Investment" 
+                  value={formatNumber(results.constructionCostTotalInclPlot)}
+                  subValue="Land + Build + Misc"
+                  icon={Euro}
+                  color="blue"
+                />
+                <StatCard 
+                  label="Proj. Revenue" 
+                  value={formatNumber(results.revenueTotal)}
+                  subValue={`@ ${inputs.salePricePerSqm} €/m²`}
+                  icon={TrendingUp}
+                  color="green"
+                />
+                <StatCard 
+                  label="Net Profit" 
+                  value={formatNumber(results.profitTotal)}
+                  subValue={`Margin: ${results.profitMargin.toFixed(1)}%`}
+                  icon={Wallet}
+                  trend={results.profitTotal > 0 ? 'positive' : 'negative'}
+                  // Fix: 'emerald' is not a valid color in StatCardProps, using 'green' instead
+                  color={results.profitTotal > 0 ? 'green' : 'amber'}
+                />
+                <StatCard 
+                  label="ROI" 
+                  value={`${results.roi.toFixed(1)}%`}
+                  subValue="Return on Cost"
+                  icon={Activity}
+                  color={results.roi > 15 ? 'green' : results.roi > 0 ? 'amber' : 'slate'}
+                />
               </div>
 
-              <div className="p-6">
-                {activeTab === 'overview' && (
-                  <div className="space-y-6">
-                    
-                    {/* Graphical Metrics Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                      {/* Strength Gauge */}
-                      <div className="md:col-span-5 flex flex-col gap-4">
-                        <StrengthGauge margin={results.profitMargin} />
-                        {/* New Risk Bar */}
-                        <RiskBar margin={results.profitMargin} />
-                      </div>
-
-                      {/* Cost Distribution Circles */}
-                      <div className="md:col-span-7 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between transition-colors">
-                         <div className="flex items-center gap-2 mb-3">
-                            <Layers size={18} className="text-slate-600 dark:text-slate-400" />
-                            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Expense Breakdown</span>
-                         </div>
-                         <div className="flex items-center justify-around gap-3 h-full">
-                           <CircleIndicator 
-                             percentage={percentages.plot} 
-                             colorClass={isDarkMode ? "text-blue-500" : "text-blue-900"} 
-                             label="Plot" 
-                             icon={MapIcon}
-                           />
-                           <CircleIndicator 
-                             percentage={percentages.construction} 
-                             colorClass={isDarkMode ? "text-sky-500" : "text-blue-700"} 
-                             label="Construction" 
-                             icon={Hammer}
-                           />
-                           <CircleIndicator 
-                             percentage={percentages.misc} 
-                             colorClass="text-slate-400" 
-                             label="Soft Costs" 
-                             icon={Wallet}
-                           />
-                         </div>
-                      </div>
+              {/* Visuals Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 {/* Cost Structure Chart */}
+                 <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">Cost Breakdown</h3>
+                    <div className="h-64 flex items-center justify-center">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={costBreakdownData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {costBreakdownData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
+                                    ))}
+                                </Pie>
+                                <Tooltip 
+                                    formatter={(value: number) => formatCurrency(value)}
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
                     </div>
-
-                    {/* Break-even Price Helper (Moved Here) */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-900/50 mt-2">
-                       <div className="flex justify-between items-center text-sm mb-1">
-                         <span className="text-blue-900 dark:text-blue-300 font-medium">Break-even Price</span>
-                         <span className="text-blue-950 dark:text-blue-100 font-bold">{formatCurrency(results.costPerSqmInclPlot)} /m²</span>
-                       </div>
-                       <div className="w-full bg-blue-200 dark:bg-blue-900/50 h-2 rounded-full mt-2 overflow-hidden">
-                         <div 
-                           className="h-full bg-blue-900 dark:bg-blue-500 transition-all duration-500"
-                           style={{ width: `${Math.min((results.costPerSqmInclPlot / inputs.salePricePerSqm) * 100, 100)}%` }}
-                         />
-                       </div>
-                       <p className="text-xs text-blue-900 dark:text-blue-300 mt-2 text-right">
-                         Current margin safety: {Math.max(0, 100 - (results.costPerSqmInclPlot / inputs.salePricePerSqm * 100)).toFixed(1)}%
-                       </p>
-                    </div>
-
-                    {/* Revenue vs Cost Chart */}
-                    <div className="h-[250px] w-full mt-4">
-                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2 pl-2">Revenue vs Investment</p>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} layout="vertical">
-                          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke={isDarkMode ? "#334155" : "#f1f5f9"} />
-                          <XAxis type="number" hide />
-                          <YAxis dataKey="name" type="category" width={80} tick={{fontSize: 12, fill: isDarkMode ? '#cbd5e1' : '#1e3a8a'}} />
-                          <Tooltip 
-                            cursor={{ fill: isDarkMode ? '#1e293b' : '#f8fafc' }}
-                            contentStyle={{ 
-                              borderRadius: '12px', 
-                              border: 'none', 
-                              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                              backgroundColor: isDarkMode ? '#1e293b' : '#fff',
-                              color: isDarkMode ? '#fff' : '#000'
-                            }}
-                            formatter={(value: number) => formatCurrency(value)}
-                          />
-                          <Bar dataKey="value" radius={[0, 8, 8, 0]} barSize={40}>
-                            {revenueData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={index === 0 ? (isDarkMode ? '#94a3b8' : '#64748b') : results.profitTotal > 0 ? '#10b981' : '#f59e0b'} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center transition-colors">
-                       <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Constr. Cost</p>
-                          <p className="text-lg font-bold text-slate-700 dark:text-slate-200">{formatCurrency(results.constructionCostTotal)}</p>
-                       </div>
-                       <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Total Cost/m²</p>
-                          <p className="text-lg font-bold text-slate-700 dark:text-slate-200">{formatCurrency(results.costPerSqmInclPlot)}</p>
-                       </div>
-                       <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">ROI</p>
-                          <p className={`text-lg font-bold ${results.roi >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                            {results.roi.toFixed(1)}%
-                          </p>
-                       </div>
-                       <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold">Margin</p>
-                          <p className={`text-lg font-bold ${results.profitMargin >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                            {results.profitMargin.toFixed(1)}%
-                          </p>
-                       </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'breakdown' && (
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-8 h-[300px]">
-                    <div className="w-full md:w-1/2 h-full">
-                       <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={costBreakdownData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={100}
-                            paddingAngle={5}
-                            dataKey="value"
-                            stroke="none"
-                          >
-                            {costBreakdownData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip 
-                            formatter={(value: number) => formatCurrency(value)}
-                            contentStyle={{ 
-                              backgroundColor: isDarkMode ? '#1e293b' : '#fff',
-                              color: isDarkMode ? '#fff' : '#000',
-                              border: 'none',
-                              borderRadius: '8px',
-                              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                            }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="w-full md:w-1/2 space-y-3">
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Detailed Cost Breakdown</h4>
+                    <div className="flex justify-center gap-4 mt-2">
                         {costBreakdownData.map((item, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
-                            <div className="flex items-center gap-3">
-                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{item.name}</span>
+                            <div key={idx} className="flex items-center gap-1.5">
+                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{item.name}</span>
                             </div>
-                            <div className="text-right">
-                              <span className="block text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(item.value)}</span>
-                              <span className="text-xs text-slate-500 dark:text-slate-400">{((item.value / results.constructionCostTotalInclPlot) * 100).toFixed(1)}%</span>
-                            </div>
-                          </div>
                         ))}
                     </div>
-                  </div>
-                )}
+                 </div>
 
-                {activeTab === 'design' && (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                       {/* Input Side */}
-                       <div className="space-y-4">
-                         <div className="bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                              onClick={() => fileInputRef.current?.click()}>
-                           <input 
-                             type="file" 
-                             ref={fileInputRef} 
-                             className="hidden" 
-                             accept="image/*"
-                             onChange={handleImageUpload}
-                           />
-                           {designState.originalImage ? (
-                             <img src={designState.originalImage} alt="Original Plot" className="max-h-64 rounded-lg shadow-sm object-cover" />
-                           ) : (
-                             <>
-                               <div className="bg-white dark:bg-slate-800 p-3 rounded-full shadow-sm mb-3">
-                                 <Upload className="text-blue-900 dark:text-blue-500" size={24} />
-                               </div>
-                               <h3 className="text-slate-900 dark:text-white font-semibold">Upload Photo of Plot</h3>
-                               <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Click to browse or drag & drop</p>
-                             </>
+                 {/* Indicators */}
+                 <div className="space-y-4">
+                     <StrengthGauge margin={results.profitMargin} />
+                     <RiskBar margin={results.profitMargin} />
+                     <div className="bg-blue-900 text-white p-5 rounded-xl shadow-lg relative overflow-hidden">
+                        <div className="relative z-10">
+                            <p className="text-blue-200 text-xs font-bold uppercase tracking-wider mb-1">Break-even Point</p>
+                            <h3 className="text-2xl font-bold">
+                                {formatCurrency(results.costPerSqmInclPlot)} <span className="text-sm font-medium opacity-70">/ m²</span>
+                            </h3>
+                            <p className="text-xs text-blue-100 mt-2 opacity-80">
+                                You need to sell above this price to make a profit.
+                            </p>
+                        </div>
+                        <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4">
+                            <Euro size={100} />
+                        </div>
+                     </div>
+                 </div>
+              </div>
+
+              {/* AI Consultant Section */}
+              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/50 rounded-2xl border border-indigo-100 dark:border-slate-700 p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                  <Sparkles size={120} />
+                </div>
+                
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="text-indigo-600 dark:text-indigo-400" size={24} />
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">Gemini AI Investment Consultant</h3>
+                    </div>
+                    <button
+                      onClick={handleGenerateAI}
+                      disabled={aiState.loading}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {aiState.loading ? (
+                        <>
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                          Analyzing...
+                        </>
+                      ) : (
+                        <>
+                          Analyze Investment
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-6 max-w-2xl">
+                    Get an instant professional opinion on this project's viability in the Greek market.
+                  </p>
+
+                  {aiState.error && (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl p-4 text-sm text-red-800 dark:text-red-200 animate-in fade-in">
+                       <div className="flex items-start gap-3">
+                         <ShieldAlert className="shrink-0 mt-0.5" size={18} />
+                         <div>
+                           <p className="font-bold mb-1">Analysis Failed</p>
+                           <p className="opacity-90">{aiState.error === "ENABLE_API_REQUIRED" ? "The AI Service is disabled for this project." : aiState.error === "API_KEY_RESTRICTED" ? "The API Key is restricted." : aiState.error === "API_KEY_LEAKED" ? "The API Key was leaked and blocked." : aiState.error}</p>
+                           
+                           {aiState.error === "ENABLE_API_REQUIRED" && (
+                             <a 
+                               href="https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=802024199226"
+                               target="_blank"
+                               rel="noreferrer"
+                               className="inline-flex items-center gap-1 mt-2 text-red-700 dark:text-red-300 font-bold underline hover:no-underline"
+                             >
+                               Enable API in Google Console <ExternalLink size={12}/>
+                             </a>
+                           )}
+
+                            {aiState.error === "API_KEY_RESTRICTED" && (
+                             <div className="mt-2 text-xs bg-white/50 dark:bg-black/20 p-2 rounded">
+                               <strong>How to fix:</strong>
+                               <ol className="list-decimal ml-4 mt-1 space-y-1">
+                                 <li>Go to <a href="https://console.cloud.google.com/apis/credentials?project=802024199226" target="_blank" className="underline">Google Cloud Credentials</a></li>
+                                 <li>Click on <strong>"Browser key (auto created by Firebase)"</strong></li>
+                                 <li>Scroll to "API restrictions"</li>
+                                 <li>Select <strong>"Generative Language API"</strong> from the dropdown list</li>
+                                 <li>Click Save</li>
+                               </ol>
+                             </div>
+                           )}
+
+                           {aiState.error === "API_KEY_LEAKED" && (
+                             <div className="mt-2 text-xs bg-white/50 dark:bg-black/20 p-2 rounded">
+                               <p><strong>Security Alert:</strong> Google blocked the hardcoded key.</p>
+                               <p className="mt-1">The app has been updated to use your secure Vercel Environment Variable instead. Please Redeploy.</p>
+                             </div>
                            )}
                          </div>
-
-                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700 dark:text-slate-200">What would you like to build/change?</label>
-                            <textarea 
-                              className="w-full p-3 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-900 dark:focus:ring-blue-500 focus:border-blue-900 dark:focus:border-blue-500 outline-none resize-none h-24 text-sm placeholder:text-slate-400"
-                              placeholder="e.g. Add a modern two-story white villa with a swimming pool and olive trees."
-                              value={designState.prompt}
-                              onChange={(e) => setDesignState(prev => ({...prev, prompt: e.target.value}))}
-                            />
-                         </div>
-
-                         <button 
-                            className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
-                              !designState.originalImage || designState.loading
-                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                                : 'bg-blue-900 dark:bg-blue-600 text-white hover:bg-blue-950 dark:hover:bg-blue-700 shadow-lg hover:shadow-blue-900/20'
-                            }`}
-                            onClick={handleGenerateDesign}
-                            disabled={!designState.originalImage || designState.loading}
-                         >
-                            {designState.loading ? (
-                              <>
-                                <Wand2 className="animate-spin" size={20} />
-                                Generating Visualization...
-                              </>
-                            ) : (
-                              <>
-                                <Wand2 size={20} />
-                                Generate Visualization
-                              </>
-                            )}
-                         </button>
-                         {designState.error && (
-                           <div className={`text-sm p-3 rounded-lg border flex flex-col gap-2 ${
-                              designState.error.includes("Analysis section") 
-                              ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800"
-                              : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800"
-                           }`}>
-                             {designState.error}
-                           </div>
-                         )}
                        </div>
+                    </div>
+                  )}
 
-                       {/* Result Side */}
-                       <div className="bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-800 p-1 flex items-center justify-center min-h-[400px]">
-                          {designState.generatedImage ? (
-                            <div className="relative group w-full h-full">
-                              <img src={designState.generatedImage} alt="Generated Design" className="w-full h-full object-contain rounded-lg shadow-sm" />
-                              <a href={designState.generatedImage} download="domos-design.png" className="absolute top-4 right-4 bg-white/90 dark:bg-slate-800/90 p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:text-blue-900 dark:hover:text-blue-400 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Download size={20} />
-                              </a>
-                            </div>
+                  {aiState.content && (
+                    <div className="bg-white/80 dark:bg-slate-900/50 rounded-xl p-6 border border-indigo-50 dark:border-slate-700 prose dark:prose-invert prose-sm max-w-none animate-in fade-in slide-in-from-bottom-2">
+                       <div className="whitespace-pre-wrap font-medium leading-relaxed">
+                         {aiState.content}
+                       </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'breakdown' && (
+          <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="flex justify-between items-center">
+                <div>
+                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Saved Projects Dashboard</h2>
+                   <p className="text-slate-500 dark:text-slate-400 mt-1">Manage and compare your investment scenarios</p>
+                </div>
+                <div className="bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium">
+                   {savedProjects.length} Projects Found
+                </div>
+             </div>
+
+             {isLoadingProjects ? (
+                <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                   <div className="animate-spin mb-4 text-blue-600">
+                      <RotateCcw size={32} />
+                   </div>
+                   <p>Loading projects...</p>
+                </div>
+             ) : savedProjects.length === 0 ? (
+                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
+                   <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                      <FolderOpen size={32} />
+                   </div>
+                   <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-1">No saved projects yet</h3>
+                   <p className="text-slate-500 mb-6">Start by calculating a new project and saving it.</p>
+                   <button 
+                      onClick={() => setActiveTab('overview')}
+                      className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                   >
+                      Create First Project
+                   </button>
+                </div>
+             ) : (
+                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                   <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                         <thead>
+                            <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
+                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Project Name</th>
+                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
+                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total Budget</th>
+                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Net Profit</th>
+                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Margin</th>
+                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Actions</th>
+                            </tr>
+                         </thead>
+                         <tbody>
+                            {savedProjects.map((project) => {
+                               const metrics = calculateProjectMetrics(project.inputs);
+                               return (
+                                  <tr key={project.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+                                     <td className="p-4">
+                                        <div className="font-bold text-slate-900 dark:text-white">{project.name}</div>
+                                     </td>
+                                     <td className="p-4 text-slate-600 dark:text-slate-300 text-sm">
+                                        <div className="flex items-center gap-1.5">
+                                           <MapPin size={14} className="opacity-50" />
+                                           {project.inputs.location}
+                                        </div>
+                                     </td>
+                                     <td className="p-4 text-slate-500 text-sm">
+                                        {new Date(project.createdAt).toLocaleDateString()}
+                                     </td>
+                                     <td className="p-4 text-right font-medium text-slate-700 dark:text-slate-300">
+                                        {formatNumber(metrics.totalInv)} €
+                                     </td>
+                                     <td className={`p-4 text-right font-bold ${metrics.profit > 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                        {formatNumber(metrics.profit)} €
+                                     </td>
+                                     <td className="p-4 text-right">
+                                        <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${
+                                           metrics.margin > 15 
+                                             ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                             : metrics.margin > 0
+                                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                        }`}>
+                                           {metrics.margin.toFixed(1)}%
+                                        </span>
+                                     </td>
+                                     <td className="p-4 text-center">
+                                        <div className="flex items-center justify-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                           <button 
+                                              onClick={() => handleLoadProject(project)}
+                                              className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                              title="Load Project"
+                                           >
+                                              <FolderOpen size={18} />
+                                           </button>
+                                           <button 
+                                              onClick={(e) => handleDeleteClick(e, project.id)}
+                                              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                              title="Delete Project"
+                                           >
+                                              <Trash2 size={18} />
+                                           </button>
+                                        </div>
+                                     </td>
+                                  </tr>
+                               );
+                            })}
+                         </tbody>
+                      </table>
+                   </div>
+                </div>
+             )}
+          </div>
+        )}
+
+        {activeTab === 'design' && (
+           <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                 <div className="p-8 border-b border-slate-100 dark:border-slate-700">
+                    <div className="flex items-center gap-3 mb-2">
+                       <div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg">
+                          <Wand2 size={24} />
+                       </div>
+                       <h2 className="text-2xl font-bold">AI Design Studio</h2>
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-400 max-w-2xl">
+                       Upload a photo of your plot or an existing structure, and let AI visualize potential developments or renovations instantly.
+                    </p>
+                 </div>
+                 
+                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Upload Section */}
+                    <div className="space-y-4">
+                       <h3 className="font-semibold text-slate-900 dark:text-white">1. Upload Source Image</h3>
+                       <div 
+                          onClick={() => fileInputRef.current?.click()}
+                          className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-700/50 relative overflow-hidden group ${
+                             designState.originalImage 
+                               ? 'border-purple-200 dark:border-purple-900' 
+                               : 'border-slate-300 dark:border-slate-600'
+                          }`}
+                       >
+                          {designState.originalImage ? (
+                             <img src={designState.originalImage} alt="Source" className="w-full h-full object-cover" />
                           ) : (
-                            <div className="text-center p-8 opacity-60">
-                              <ImagePlus size={48} className="mx-auto text-blue-300 dark:text-blue-500 mb-4" />
-                              <p className="text-blue-900 dark:text-blue-200 font-medium">Visualization Preview</p>
-                              <p className="text-blue-900/70 dark:text-blue-300/70 text-sm mt-1">Upload an image and describe your vision to see it here.</p>
-                            </div>
+                             <div className="text-center p-6">
+                                <Upload size={32} className="mx-auto text-slate-400 mb-2 group-hover:scale-110 transition-transform" />
+                                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Click to upload photo</p>
+                                <p className="text-xs text-slate-400 mt-1">JPG, PNG up to 5MB</p>
+                             </div>
+                          )}
+                          <input 
+                             type="file" 
+                             ref={fileInputRef} 
+                             onChange={handleImageUpload} 
+                             className="hidden" 
+                             accept="image/*"
+                          />
+                       </div>
+                    </div>
+
+                    {/* Result Section */}
+                    <div className="space-y-4">
+                       <h3 className="font-semibold text-slate-900 dark:text-white">2. AI Generation</h3>
+                       <div className={`aspect-square rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center relative overflow-hidden ${designState.loading ? 'animate-pulse' : ''}`}>
+                          {designState.loading ? (
+                             <div className="text-center">
+                                <Wand2 size={32} className="mx-auto text-purple-500 animate-spin mb-2" />
+                                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Generating Vision...</p>
+                             </div>
+                          ) : designState.generatedImage ? (
+                             <>
+                                <img src={designState.generatedImage} alt="Generated" className="w-full h-full object-cover animate-in fade-in" />
+                                <a 
+                                   href={designState.generatedImage} 
+                                   download="domos-design.png"
+                                   className="absolute bottom-4 right-4 p-2 bg-white/90 text-slate-900 rounded-lg shadow-lg hover:bg-white transition-colors"
+                                   title="Download"
+                                >
+                                   <Download size={18} />
+                                </a>
+                             </>
+                          ) : designState.error ? (
+                             <div className="text-center p-6 text-red-500">
+                                <AlertTriangle size={32} className="mx-auto mb-2" />
+                                <p className="text-sm">{designState.error}</p>
+                             </div>
+                          ) : (
+                             <div className="text-center p-6 text-slate-400">
+                                <ImagePlus size={32} className="mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">Result will appear here</p>
+                             </div>
                           )}
                        </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* AI Assistant Section */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 rounded-2xl p-6 border border-blue-100 dark:border-slate-700 relative overflow-hidden">
-               <div className="absolute top-0 right-0 p-4 opacity-10">
-                 <Sparkles size={64} className="text-blue-900 dark:text-blue-400" />
-               </div>
-               
-               <div className="flex items-start justify-between mb-4 relative z-10">
-                 <div>
-                   <h3 className="text-lg font-bold text-blue-900 dark:text-blue-100 flex items-center gap-2">
-                     <Sparkles size={18} className="text-blue-900 dark:text-blue-400" />
-                     Gemini AI Investment Consultant
-                   </h3>
-                   <p className="text-sm text-blue-800 dark:text-blue-300 mt-1">
-                     Get an instant professional opinion on this project's viability in the Greek market.
-                   </p>
                  </div>
-                 <button
-                    onClick={handleGenerateAI}
-                    disabled={aiState.loading}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all ${
-                      aiState.loading 
-                        ? 'bg-blue-200 text-blue-500 cursor-not-allowed dark:bg-slate-700 dark:text-slate-500'
-                        : 'bg-blue-900 text-white hover:bg-blue-950 hover:shadow-md dark:bg-blue-600 dark:hover:bg-blue-700'
-                    }`}
-                 >
-                   {aiState.loading ? 'Analyzing...' : 'Analyze Investment'}
-                 </button>
-               </div>
 
-               {aiState.error === "ENABLE_API_REQUIRED" ? (
-                 <div className="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-xl border border-amber-200 dark:border-amber-800 animate-in fade-in slide-in-from-bottom-2">
-                    <div className="flex items-start gap-3">
-                       <div className="p-2 bg-amber-100 dark:bg-amber-800/50 rounded-full text-amber-700 dark:text-amber-400">
-                         <Lock size={20} />
-                       </div>
-                       <div>
-                          <h4 className="font-bold text-amber-900 dark:text-amber-100">API Service Not Enabled</h4>
-                          <p className="text-sm text-amber-800 dark:text-amber-300 mt-1 mb-3">
-                             The "Generative Language API" is currently disabled in your Google Cloud Project. You must enable it to use AI features.
-                          </p>
-                          <a 
-                            href="https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=802024199226"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-lg transition-colors shadow-sm"
-                          >
-                            Enable API in Google Cloud
-                            <ExternalLink size={14} />
-                          </a>
-                       </div>
+                 <div className="p-8 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                       Describe your vision
+                    </label>
+                    <div className="flex gap-2">
+                       <input 
+                          type="text" 
+                          value={designState.prompt}
+                          onChange={(e) => setDesignState(prev => ({ ...prev, prompt: e.target.value }))}
+                          className="flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-purple-500 outline-none"
+                          placeholder="e.g. Modern two-story villa with white facade and swimming pool"
+                       />
+                       <button 
+                          onClick={handleGenerateDesign}
+                          disabled={!designState.originalImage || designState.loading}
+                          className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-md"
+                       >
+                          <Wand2 size={18} />
+                          Generate
+                       </button>
                     </div>
                  </div>
-               ) : aiState.error === "API_KEY_RESTRICTED" ? (
-                  <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-bottom-2">
-                     <div className="flex items-start gap-3">
-                        <div className="p-2 bg-red-100 dark:bg-red-800/50 rounded-full text-red-700 dark:text-red-400">
-                          <ShieldAlert size={20} />
-                        </div>
-                        <div>
-                           <h4 className="font-bold text-red-900 dark:text-red-100">API Key Missing Permissions</h4>
-                           <p className="text-sm text-red-800 dark:text-red-300 mt-1 mb-3">
-                              You are using the <strong>"Browser key (auto created by Firebase)"</strong> but it is blocking the AI service.
-                           </p>
-                           <ol className="list-decimal list-inside text-sm text-red-800 dark:text-red-300 mb-3 space-y-1">
-                              <li>Click the button below to open Credentials.</li>
-                              <li>Click on the name <strong>"Browser key (auto created by Firebase)"</strong>.</li>
-                              <li>Scroll down to <strong>"API restrictions"</strong>.</li>
-                              <li>In the dropdown, select <strong>"Generative Language API"</strong> and check the box.</li>
-                              <li>Click <strong>OK</strong> and then <strong>SAVE</strong>.</li>
-                           </ol>
-                           <a 
-                             href="https://console.cloud.google.com/apis/credentials?project=802024199226"
-                             target="_blank"
-                             rel="noopener noreferrer"
-                             className="inline-flex items-center gap-2 px-4 py-2 bg-red-700 hover:bg-red-800 text-white text-sm font-bold rounded-lg transition-colors shadow-sm"
-                           >
-                             Fix Key Permissions
-                             <ExternalLink size={14} />
-                           </a>
-                        </div>
-                     </div>
-                  </div>
-               ) : aiState.error === "API_KEY_LEAKED" ? (
-                  <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-bottom-2">
-                     <div className="flex items-start gap-3">
-                        <div className="p-2 bg-red-100 dark:bg-red-800/50 rounded-full text-red-700 dark:text-red-400">
-                          <ShieldAlert size={20} />
-                        </div>
-                        <div>
-                           <h4 className="font-bold text-red-900 dark:text-red-100">API Key Blocked (Leaked)</h4>
-                           <p className="text-sm text-red-800 dark:text-red-300 mt-1 mb-3">
-                              Google detected the previous key in public code and blocked it. 
-                              We have automatically updated the app to use your secure Vercel key instead.
-                           </p>
-                           <div className="p-2 bg-white/50 dark:bg-black/20 rounded border border-red-100 dark:border-red-800 text-sm font-mono text-red-800 dark:text-red-200 mb-3">
-                              Please Redeploy your app on Vercel for the fix to take effect.
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               ) : aiState.error && (
-                 <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-3 rounded-lg text-sm border border-red-100 dark:border-red-800">
-                   {aiState.error}
-                 </div>
-               )}
-
-               {aiState.content && (
-                 <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-5 rounded-xl border border-blue-100 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-sm leading-relaxed whitespace-pre-line animate-in fade-in slide-in-from-bottom-2 duration-500">
-                   <div className="prose prose-sm prose-blue dark:prose-invert max-w-none">
-                     {/* Simple rendering of markdown-like text */}
-                     {aiState.content.split('**').map((part, i) => 
-                        i % 2 === 1 ? <strong key={i} className="text-blue-900 dark:text-blue-300">{part}</strong> : part
-                     )}
-                   </div>
-                 </div>
-               )}
-            </div>
-
-          </div>
-        </div>
-
-        {/* FULL WIDTH SAVED PROJECTS DASHBOARD */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors">
-           <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-blue-950 dark:text-white flex items-center gap-2">
-                 <FolderOpen className="text-blue-900 dark:text-blue-400" size={20} />
-                 Saved Projects Dashboard
-              </h2>
-              <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                {savedProjects.length} Records
-              </span>
+              </div>
            </div>
-
-           <div className="overflow-x-auto">
-             {isLoadingProjects ? (
-                <div className="p-8 text-center text-slate-500 dark:text-slate-400">Loading projects...</div>
-             ) : savedProjects.length === 0 ? (
-                <div className="p-12 text-center">
-                  <div className="bg-slate-50 dark:bg-slate-700/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                     <FolderOpen size={32} className="text-slate-400 dark:text-slate-500" />
-                  </div>
-                  <h3 className="text-slate-900 dark:text-white font-semibold">No saved projects found</h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Analysis records will appear here after you save them.</p>
-                </div>
-             ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs uppercase font-semibold">
-                    <tr>
-                      <th className="px-6 py-4">Project Name & Owner</th>
-                      <th className="px-6 py-4">Address / Location</th>
-                      <th className="px-6 py-4 text-right">Total Investment</th>
-                      <th className="px-6 py-4 text-right">Potential Revenue</th>
-                      <th className="px-6 py-4 text-right">Net Profit</th>
-                      <th className="px-6 py-4 text-center">Strength</th>
-                      <th className="px-6 py-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                    {savedProjects.map((project) => {
-                      const metrics = calculateProjectMetrics(project.inputs);
-                      
-                      // Strength Badge Logic
-                      let badgeColor = "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800";
-                      let badgeText = "Risky";
-                      if (metrics.margin > 25) {
-                         badgeColor = "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800";
-                         badgeText = "Excellent";
-                      } else if (metrics.margin > 15) {
-                         badgeColor = "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800";
-                         badgeText = "Good";
-                      } else if (metrics.margin > 5) {
-                         badgeColor = "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800";
-                         badgeText = "Moderate";
-                      }
-
-                      return (
-                        <tr key={project.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group">
-                          <td className="px-6 py-4 align-top">
-                             <div className="font-bold text-slate-900 dark:text-white">{project.name}</div>
-                             {project.inputs.ownerNotes && (
-                               <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 max-w-[200px]">
-                                 <span className="font-semibold">Note:</span> {project.inputs.ownerNotes}
-                               </div>
-                             )}
-                          </td>
-                          <td className="px-6 py-4 align-top text-sm text-slate-600 dark:text-slate-300">
-                             <div className="flex items-center gap-1.5">
-                               <MapPin size={14} className="text-slate-400" />
-                               {project.inputs.location}
-                             </div>
-                             <div className="text-xs text-slate-400 mt-1 pl-5">
-                               {project.inputs.plotSize} m² • €{formatNumber(project.inputs.plotPrice)}
-                             </div>
-                          </td>
-                          <td className="px-6 py-4 align-top text-right font-medium text-slate-700 dark:text-slate-300">
-                             {formatCurrency(metrics.totalInv)}
-                          </td>
-                          <td className="px-6 py-4 align-top text-right font-medium text-blue-700 dark:text-blue-300">
-                             {formatCurrency(metrics.revenue)}
-                          </td>
-                          <td className="px-6 py-4 align-top text-right font-bold text-slate-900 dark:text-white">
-                             {formatCurrency(metrics.profit)}
-                             <div className="text-xs font-normal text-slate-500 dark:text-slate-400 mt-0.5">
-                               {metrics.margin.toFixed(1)}% Margin
-                             </div>
-                          </td>
-                          <td className="px-6 py-4 align-top text-center">
-                             <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold border ${badgeColor}`}>
-                               {badgeText}
-                             </span>
-                          </td>
-                          <td className="px-6 py-4 align-top text-right">
-                             <div className="flex items-center justify-end gap-2">
-                               <button 
-                                 onClick={() => handleLoadProject(project)}
-                                 className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
-                                 title="Load Project"
-                               >
-                                 <ArrowUpRight size={18} />
-                               </button>
-                               <button 
-                                 onClick={(e) => handleDeleteClick(e, project.id)}
-                                 className="p-2 text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                 title="Delete Project"
-                               >
-                                 <Trash2 size={18} />
-                               </button>
-                             </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-             )}
-           </div>
-        </div>
+        )}
 
       </main>
     </div>
