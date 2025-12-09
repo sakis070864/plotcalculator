@@ -308,6 +308,54 @@ const RiskBar = ({ margin }: { margin: number }) => {
   );
 };
 
+const ProgressRing = ({ percentage, label, colorClass, trailColorClass = "text-slate-100 dark:text-slate-700" }: { percentage: number, label: string, colorClass: string, trailColorClass?: string }) => {
+  const radius = 28;
+  const stroke = 6;
+  const normalizedRadius = radius - stroke * 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative flex items-center justify-center">
+        <svg
+          height={radius * 2}
+          width={radius * 2}
+          className="rotate-[-90deg]"
+        >
+          <circle
+            stroke="currentColor"
+            fill="transparent"
+            strokeWidth={stroke}
+            strokeDasharray={circumference + ' ' + circumference}
+            style={{ strokeDashoffset: 0 }}
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+            className={trailColorClass}
+          />
+          <circle
+            stroke="currentColor"
+            fill="transparent"
+            strokeWidth={stroke}
+            strokeDasharray={circumference + ' ' + circumference}
+            style={{ strokeDashoffset }}
+            strokeLinecap="round"
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+            className={`${colorClass} transition-all duration-1000 ease-out`}
+          />
+        </svg>
+        <span className="absolute text-xs font-bold text-slate-700 dark:text-white">
+          {percentage}%
+        </span>
+      </div>
+      <span className="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+    </div>
+  );
+};
+
 const getStrengthLabel = (margin: number) => {
   if (margin >= 25) return { label: "Excellent", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" };
   if (margin >= 18) return { label: "Very Good", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" };
@@ -366,7 +414,7 @@ const App: React.FC = () => {
   });
 
   const [isEstimatingPrice, setIsEstimatingPrice] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'design'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'saved' | 'design'>('overview');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -422,12 +470,6 @@ const App: React.FC = () => {
       miscCostsValue: miscCosts
     };
   }, [inputs]);
-
-  const costBreakdownData = [
-    { name: 'Plot', value: inputs.plotPrice, color: isDarkMode ? '#3b82f6' : '#1e3a8a' }, 
-    { name: 'Construction', value: results.constructionCostTotal, color: isDarkMode ? '#0ea5e9' : '#2563eb' }, 
-    { name: 'Misc/Tax', value: results.miscCostsValue, color: isDarkMode ? '#94a3b8' : '#64748b' }, 
-  ];
 
   const handleInputChange = (field: keyof ProjectInputs, value: number | string) => {
     setInputs(prev => ({ ...prev, [field]: value }));
@@ -600,6 +642,11 @@ const App: React.FC = () => {
     );
   }
 
+  // Calculate percentage values for rings
+  const plotPct = Math.round((inputs.plotPrice / results.constructionCostTotalInclPlot) * 100);
+  const constrPct = Math.round((results.constructionCostTotal / results.constructionCostTotalInclPlot) * 100);
+  const softPct = Math.round((results.miscCostsValue / results.constructionCostTotalInclPlot) * 100);
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 pb-12 transition-colors duration-200 relative">
       
@@ -719,9 +766,12 @@ const App: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-8 max-w-xs mx-auto shadow-inner">
+        <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-8 max-w-md mx-auto shadow-inner">
           <button onClick={() => setActiveTab('overview')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${activeTab === 'overview' ? 'bg-white dark:bg-slate-700 text-blue-900 dark:text-white shadow-sm' : 'text-slate-500'}`}>
             <Calculator size={16} /> Calculator
+          </button>
+          <button onClick={() => setActiveTab('saved')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${activeTab === 'saved' ? 'bg-white dark:bg-slate-700 text-blue-900 dark:text-white shadow-sm' : 'text-slate-500'}`}>
+            <FolderOpen size={16} /> Saved
           </button>
           <button onClick={() => setActiveTab('design')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${activeTab === 'design' ? 'bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-300 shadow-sm' : 'text-slate-500'}`}>
             <Sparkles size={16} /> AI Design
@@ -896,51 +946,53 @@ const App: React.FC = () => {
                     <button className="text-slate-500 hover:text-slate-800 pb-2.5">Design Studio</button>
                   </div>
                   
-                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                     {/* Left Visual: Gauges */}
-                     <div className="space-y-4">
+                  {/* Visual Analysis Main Content */}
+                  <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                     {/* Left Visual: Gauge */}
+                     <div className="h-full">
                         <StrengthGauge margin={results.profitMargin} />
-                        <RiskBar margin={results.profitMargin} />
                      </div>
                      
-                     {/* Right Visual: Donuts/Charts */}
-                     <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
-                        <h4 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2"><Layers size={14}/> Expense Breakdown</h4>
-                        <div className="flex items-center justify-around h-32">
-                            <div className="text-center">
-                               <div className="relative w-16 h-16 rounded-full border-4 border-blue-900 flex items-center justify-center text-xs font-bold text-blue-900 mb-2">
-                                 {Math.round((inputs.plotPrice / results.constructionCostTotalInclPlot) * 100)}%
-                               </div>
-                               <span className="text-[10px] uppercase font-bold text-slate-400">Plot</span>
-                            </div>
-                            <div className="text-center">
-                               <div className="relative w-16 h-16 rounded-full border-4 border-blue-600 flex items-center justify-center text-xs font-bold text-blue-600 mb-2">
-                                 {Math.round((results.constructionCostTotal / results.constructionCostTotalInclPlot) * 100)}%
-                               </div>
-                               <span className="text-[10px] uppercase font-bold text-slate-400">Construction</span>
-                            </div>
-                            <div className="text-center">
-                               <div className="relative w-16 h-16 rounded-full border-4 border-slate-400 flex items-center justify-center text-xs font-bold text-slate-500 mb-2">
-                                 {Math.round((results.miscCostsValue / results.constructionCostTotalInclPlot) * 100)}%
-                               </div>
-                               <span className="text-[10px] uppercase font-bold text-slate-400">Soft Costs</span>
-                            </div>
+                     {/* Right Visual: Stacked Layout to Prevent Overlap */}
+                     <div className="flex flex-col justify-between gap-6">
+                        
+                        {/* 1. Expense Breakdown (Progress Rings) */}
+                        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                           <h4 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2"><Layers size={14}/> Expense Breakdown</h4>
+                           <div className="flex items-center justify-around">
+                               <ProgressRing 
+                                  percentage={plotPct} 
+                                  label="Plot" 
+                                  colorClass="text-blue-900 dark:text-blue-500"
+                               />
+                               <ProgressRing 
+                                  percentage={constrPct} 
+                                  label="Construction" 
+                                  colorClass="text-blue-600 dark:text-blue-400"
+                               />
+                               <ProgressRing 
+                                  percentage={softPct} 
+                                  label="Soft Costs" 
+                                  colorClass="text-slate-400 dark:text-slate-500"
+                               />
+                           </div>
                         </div>
-                     </div>
-                  </div>
 
-                  {/* Break-even Bar */}
-                  <div className="px-6 pb-6">
-                     <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50">
-                        <div className="flex justify-between items-center mb-2">
-                           <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">Break-even Price</span>
-                           <span className="text-sm font-bold text-blue-900 dark:text-blue-300">{formatCurrency(results.costPerSqmInclPlot)} /m²</span>
-                        </div>
-                        <div className="h-3 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
-                           <div className="h-full bg-blue-900 dark:bg-blue-400" style={{ width: '60%' }}></div>
-                        </div>
-                        <div className="text-right mt-1">
-                           <span className="text-xs text-blue-600 dark:text-blue-400">Current margin safety: {results.profitMargin.toFixed(1)}%</span>
+                        {/* 2. Risk Bar */}
+                        <RiskBar margin={results.profitMargin} />
+
+                        {/* 3. Break-even Bar */}
+                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">Break-even Price</span>
+                              <span className="text-sm font-bold text-blue-900 dark:text-blue-300">{formatCurrency(results.costPerSqmInclPlot)} /m²</span>
+                            </div>
+                            <div className="h-3 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
+                              <div className="h-full bg-blue-900 dark:bg-blue-400" style={{ width: '60%' }}></div>
+                            </div>
+                            <div className="text-right mt-1">
+                              <span className="text-xs text-blue-600 dark:text-blue-400">Current margin safety: {results.profitMargin.toFixed(1)}%</span>
+                            </div>
                         </div>
                      </div>
                   </div>
@@ -1015,9 +1067,12 @@ const App: React.FC = () => {
 
               </div>
             </div>
-
-            {/* --- SAVED PROJECTS DASHBOARD (Moved from Tab to Main Page) --- */}
-            <div className="pt-8 border-t border-slate-200 dark:border-slate-700">
+          </div>
+        )}
+        
+        {/* --- SAVED PROJECTS DASHBOARD (Separate Tab) --- */}
+        {activeTab === 'saved' && (
+           <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-3">
                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg"><FolderOpen size={24} /></div>
@@ -1098,7 +1153,6 @@ const App: React.FC = () => {
                   </div>
                )}
             </div>
-          </div>
         )}
 
         {/* AI Design Tab Content */}
