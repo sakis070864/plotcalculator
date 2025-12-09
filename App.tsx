@@ -391,6 +391,7 @@ const App: React.FC = () => {
   const [notification, setNotification] = useState<{message: string, type: 'success'|'error'} | null>(null);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [duplicateWarningOpen, setDuplicateWarningOpen] = useState(false);
+  const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
   const [saveProjectName, setSaveProjectName] = useState("");
 
   const [aiState, setAiState] = useState<AIAnalysisState>({
@@ -552,16 +553,23 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDeleteProject = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); 
-    // Immediate delete without confirmation to avoid sandboxing issues
+  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDeleteConfirmationId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmationId) return;
+
     try {
-      await deleteProject(id);
-      setSavedProjects(prev => prev.filter(p => p.id !== id));
+      await deleteProject(deleteConfirmationId);
+      setSavedProjects(prev => prev.filter(p => p.id !== deleteConfirmationId));
       setNotification({ message: "Project deleted", type: 'success' });
     } catch (error: any) {
       console.error("Error deleting project:", error);
       setNotification({ message: "Failed to delete project", type: 'error' });
+    } finally {
+      setDeleteConfirmationId(null);
     }
   };
 
@@ -776,6 +784,43 @@ const App: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setDuplicateWarningOpen(false)}
+                  className="w-full py-3 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmationId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border-2 border-red-100 dark:border-red-900/50">
+            <div className="p-6">
+              <div className="flex flex-col items-center text-center mb-6">
+                <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4 text-red-600 dark:text-red-500">
+                  <Trash2 size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Delete Project?</h3>
+                <p className="text-slate-500 dark:text-slate-400 mt-2">
+                  Are you sure you want to delete <span className="font-semibold text-slate-800 dark:text-slate-200">"{savedProjects.find(p => p.id === deleteConfirmationId)?.name}"</span>? 
+                </p>
+                <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium">
+                  This action cannot be undone.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={confirmDelete}
+                  className="w-full py-3 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors shadow-sm"
+                >
+                  Yes, Delete Permanently
+                </button>
+                <button
+                  onClick={() => setDeleteConfirmationId(null)}
                   className="w-full py-3 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
                 >
                   Cancel
@@ -1535,7 +1580,7 @@ const App: React.FC = () => {
                                  <ArrowUpRight size={18} />
                                </button>
                                <button 
-                                 onClick={(e) => handleDeleteProject(e, project.id)}
+                                 onClick={(e) => handleDeleteClick(e, project.id)}
                                  className="p-2 text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                  title="Delete Project"
                                >
