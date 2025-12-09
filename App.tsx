@@ -153,7 +153,6 @@ const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Password</label>
             <div className="relative">
-              {/* Using Lock icon here conceptually */}
               <input 
                 type="password" 
                 value={password}
@@ -327,14 +326,19 @@ const ProgressRing = ({
   icon?: LucideIcon, 
   trailColorClass?: string 
 }) => {
-  const radius = 55; // MUCH BIGGER
-  const stroke = 10; // Thicker stroke
+  const radius = 55; // Large size
+  const stroke = 10; // Thick stroke
   const normalizedRadius = radius - stroke * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full py-2">
+    <div className="flex flex-col items-center justify-center w-full h-full py-4">
+      {/* 1. Text Above Circle */}
+      <span className="text-3xl font-bold text-slate-800 dark:text-white mb-3">
+        {percentage}%
+      </span>
+
       <div className="relative flex items-center justify-center mb-3">
         <svg
           height={radius * 2}
@@ -365,24 +369,16 @@ const ProgressRing = ({
             className={`${colorClass} transition-all duration-1000 ease-out`}
           />
         </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          {Icon && <Icon size={24} className="text-slate-400 dark:text-slate-500 mb-1" />}
-          <span className="text-3xl font-bold text-slate-700 dark:text-white leading-none">
-            {percentage}%
-          </span>
+        {/* 2. Small Icon Centered Inside */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          {Icon && <Icon size={32} className="text-slate-400 dark:text-slate-500" />}
         </div>
       </div>
+      
+      {/* Label at bottom */}
       <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</span>
     </div>
   );
-};
-
-const getStrengthLabel = (margin: number) => {
-  if (margin >= 25) return { label: "Excellent", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" };
-  if (margin >= 18) return { label: "Very Good", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" };
-  if (margin >= 12) return { label: "Good", color: "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-400" };
-  if (margin >= 5) return { label: "Moderate", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" };
-  return { label: "High Risk", color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" };
 };
 
 const INITIAL_INPUTS: ProjectInputs = {
@@ -405,6 +401,14 @@ const EMPTY_INPUTS: ProjectInputs = {
   constructionCostPerSqm: 0,
   salePricePerSqm: 0,
   miscCostsPercent: 0,
+};
+
+const getStrengthLabel = (margin: number) => {
+  if (margin >= 25) return { label: "Excellent", color: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800" };
+  if (margin >= 18) return { label: "Very Good", color: "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800" };
+  if (margin >= 12) return { label: "Good", color: "bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/30 dark:text-lime-400 dark:border-lime-800" };
+  if (margin >= 5) return { label: "Moderate", color: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800" };
+  return { label: "High Risk", color: "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800" };
 };
 
 const App: React.FC = () => {
@@ -1143,50 +1147,60 @@ const App: React.FC = () => {
                      <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                            <thead>
-                              <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
-                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Project Name & Owner</th>
-                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Address / Location</th>
-                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total Investment</th>
-                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Potential Revenue</th>
-                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Net Profit</th>
-                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Strength</th>
-                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Actions</th>
+                              <tr className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs uppercase font-semibold">
+                                 <th className="px-6 py-4">Project Name & Owner</th>
+                                 <th className="px-6 py-4">Address / Location</th>
+                                 <th className="px-6 py-4 text-right">Total Investment</th>
+                                 <th className="px-6 py-4 text-right">Potential Revenue</th>
+                                 <th className="px-6 py-4 text-right">Net Profit</th>
+                                 <th className="px-6 py-4 text-center">Strength</th>
+                                 <th className="px-6 py-4 text-right">Actions</th>
                               </tr>
                            </thead>
-                           <tbody>
+                           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                               {savedProjects.map((project) => {
                                  const metrics = calculateProjectMetrics(project.inputs);
                                  const strength = getStrengthLabel(metrics.margin);
                                  return (
-                                    <tr key={project.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
-                                       <td className="p-4">
+                                    <tr key={project.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group">
+                                       <td className="px-6 py-4 align-top">
                                           <div className="font-bold text-slate-900 dark:text-white">{project.name}</div>
-                                          <div className="text-xs text-slate-500 truncate max-w-[150px]">{project.inputs.ownerNotes}</div>
+                                          {project.inputs.ownerNotes && (
+                                             <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 max-w-[200px]">
+                                                <span className="font-semibold">Note:</span> {project.inputs.ownerNotes}
+                                             </div>
+                                          )}
                                        </td>
-                                       <td className="p-4">
-                                          <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 text-sm">
+                                       <td className="px-6 py-4 align-top text-sm text-slate-600 dark:text-slate-300">
+                                          <div className="flex items-center gap-1.5">
                                              <MapPin size={14} className="text-slate-400" />
                                              {project.inputs.location}
                                           </div>
                                           <div className="text-xs text-slate-400 mt-1 pl-5">
-                                             {project.inputs.plotSize} m² • {formatNumber(project.inputs.plotPrice)} €
+                                             {project.inputs.plotSize} m² • €{formatNumber(project.inputs.plotPrice)}
                                           </div>
                                        </td>
-                                       <td className="p-4 text-right font-medium text-slate-700 dark:text-slate-300">{formatNumber(metrics.totalInv)} €</td>
-                                       <td className="p-4 text-right font-medium text-blue-600 dark:text-blue-400">{formatNumber(metrics.revenue)} €</td>
-                                       <td className="p-4 text-right">
-                                          <div className={`font-bold ${metrics.profit > 0 ? 'text-slate-900 dark:text-white' : 'text-red-600'}`}>{formatNumber(metrics.profit)} €</div>
-                                          <div className="text-xs text-slate-500">{metrics.margin.toFixed(1)}% Margin</div>
+                                       <td className="px-6 py-4 align-top text-right font-medium text-slate-700 dark:text-slate-300">
+                                          {formatCurrency(metrics.totalInv)}
                                        </td>
-                                       <td className="p-4 text-center">
-                                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${strength.color}`}>
+                                       <td className="px-6 py-4 align-top text-right font-medium text-blue-700 dark:text-blue-300">
+                                          {formatCurrency(metrics.revenue)}
+                                       </td>
+                                       <td className="px-6 py-4 align-top text-right font-bold text-slate-900 dark:text-white">
+                                          {formatCurrency(metrics.profit)}
+                                          <div className="text-xs font-normal text-slate-500 dark:text-slate-400 mt-0.5">
+                                             {metrics.margin.toFixed(1)}% Margin
+                                          </div>
+                                       </td>
+                                       <td className="px-6 py-4 align-top text-center">
+                                          <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold border ${strength.color}`}>
                                              {strength.label}
                                           </span>
                                        </td>
-                                       <td className="p-4 text-center">
-                                          <div className="flex items-center justify-center gap-2">
-                                             <button onClick={() => handleLoadProject(project)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Load"><ArrowRight size={16} /></button>
-                                             <button onClick={(e) => handleDeleteClick(e, project.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
+                                       <td className="px-6 py-4 align-top text-right">
+                                          <div className="flex items-center justify-end gap-2">
+                                             <button onClick={() => handleLoadProject(project)} className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Load Project"><ExternalLink size={18} /></button>
+                                             <button onClick={(e) => handleDeleteClick(e, project.id)} className="p-2 text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Delete Project"><Trash2 size={18} /></button>
                                           </div>
                                        </td>
                                     </tr>
@@ -1197,55 +1211,6 @@ const App: React.FC = () => {
                      </div>
                   </div>
                )}
-            </div>
-        )}
-
-        {/* AI Design Tab Content */}
-        {activeTab === 'design' && (
-           <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                 <div className="p-8 border-b border-slate-100 dark:border-slate-700">
-                    <div className="flex items-center gap-3 mb-2">
-                       <div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg"><Wand2 size={24} /></div>
-                       <h2 className="text-2xl font-bold">AI Design Studio</h2>
-                    </div>
-                    <p className="text-slate-600 dark:text-slate-400 max-w-2xl">Upload a photo of your plot or an existing structure, and let AI visualize potential developments or renovations instantly.</p>
-                 </div>
-                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-4">
-                       <h3 className="font-semibold text-slate-900 dark:text-white">1. Upload Source Image</h3>
-                       <div onClick={() => fileInputRef.current?.click()} className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-700/50 relative overflow-hidden group ${designState.originalImage ? 'border-purple-200 dark:border-purple-900' : 'border-slate-300 dark:border-slate-600'}`}>
-                          {designState.originalImage ? (
-                             <img src={designState.originalImage} alt="Source" className="w-full h-full object-cover" />
-                          ) : (
-                             <div className="text-center p-6"><Upload size={32} className="mx-auto text-slate-400 mb-2 group-hover:scale-110 transition-transform" /><p className="text-sm font-medium text-slate-600 dark:text-slate-400">Click to upload photo</p></div>
-                          )}
-                          <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*"/>
-                       </div>
-                    </div>
-                    <div className="space-y-4">
-                       <h3 className="font-semibold text-slate-900 dark:text-white">2. AI Generation</h3>
-                       <div className={`aspect-square rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center relative overflow-hidden ${designState.loading ? 'animate-pulse' : ''}`}>
-                          {designState.loading ? (
-                             <div className="text-center"><Wand2 size={32} className="mx-auto text-purple-500 animate-spin mb-2" /><p className="text-sm font-medium text-purple-600 dark:text-purple-400">Generating Vision...</p></div>
-                          ) : designState.generatedImage ? (
-                             <><img src={designState.generatedImage} alt="Generated" className="w-full h-full object-cover animate-in fade-in" /><a href={designState.generatedImage} download="domos-design.png" className="absolute bottom-4 right-4 p-2 bg-white/90 text-slate-900 rounded-lg shadow-lg hover:bg-white transition-colors" title="Download"><Download size={18} /></a></>
-                          ) : designState.error ? (
-                             <div className="text-center p-6 text-red-500"><AlertTriangle size={32} className="mx-auto mb-2" /><p className="text-sm">{designState.error}</p></div>
-                          ) : (
-                             <div className="text-center p-6 text-slate-400"><ImagePlus size={32} className="mx-auto mb-2 opacity-50" /><p className="text-sm">Result will appear here</p></div>
-                          )}
-                       </div>
-                    </div>
-                 </div>
-                 <div className="p-8 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Describe your vision</label>
-                    <div className="flex gap-2">
-                       <input type="text" value={designState.prompt} onChange={(e) => setDesignState(prev => ({ ...prev, prompt: e.target.value }))} className="flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="e.g. Modern two-story villa..." />
-                       <button onClick={handleGenerateDesign} disabled={!designState.originalImage || designState.loading} className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-md"><Wand2 size={18} /> Generate</button>
-                    </div>
-                 </div>
-              </div>
            </div>
         )}
 
