@@ -308,6 +308,14 @@ const RiskBar = ({ margin }: { margin: number }) => {
   );
 };
 
+const getStrengthLabel = (margin: number) => {
+  if (margin >= 25) return { label: "Excellent", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" };
+  if (margin >= 18) return { label: "Very Good", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" };
+  if (margin >= 12) return { label: "Good", color: "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-400" };
+  if (margin >= 5) return { label: "Moderate", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" };
+  return { label: "High Risk", color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" };
+};
+
 const INITIAL_INPUTS: ProjectInputs = {
   location: "Athens, Greece",
   ownerNotes: "",
@@ -358,7 +366,7 @@ const App: React.FC = () => {
   });
 
   const [isEstimatingPrice, setIsEstimatingPrice] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'breakdown' | 'design'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'design'>('overview');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -711,12 +719,9 @@ const App: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-8 max-w-md mx-auto shadow-inner">
+        <div className="flex space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-8 max-w-xs mx-auto shadow-inner">
           <button onClick={() => setActiveTab('overview')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${activeTab === 'overview' ? 'bg-white dark:bg-slate-700 text-blue-900 dark:text-white shadow-sm' : 'text-slate-500'}`}>
             <Calculator size={16} /> Calculator
-          </button>
-          <button onClick={() => setActiveTab('breakdown')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${activeTab === 'breakdown' ? 'bg-white dark:bg-slate-700 text-blue-900 dark:text-white shadow-sm' : 'text-slate-500'}`}>
-            <FolderOpen size={16} /> Saved
           </button>
           <button onClick={() => setActiveTab('design')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${activeTab === 'design' ? 'bg-white dark:bg-slate-700 text-purple-700 dark:text-purple-300 shadow-sm' : 'text-slate-500'}`}>
             <Sparkles size={16} /> AI Design
@@ -724,357 +729,379 @@ const App: React.FC = () => {
         </div>
 
         {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* --- LEFT COLUMN: INPUTS & MAP --- */}
-            <div className="lg:col-span-4 space-y-6">
-              
-              {/* Project Details Card */}
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
-                <h2 className="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800 dark:text-white">
-                  <MapPin size={20} className="text-blue-600" />
-                  Plot Details
-                </h2>
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* --- LEFT COLUMN: INPUTS & MAP --- */}
+              <div className="lg:col-span-4 space-y-6">
                 
+                {/* Project Details Card */}
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm">
+                  <h2 className="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800 dark:text-white">
+                    <MapPin size={20} className="text-blue-600" />
+                    Plot Details
+                  </h2>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Location / Area</label>
+                      <input 
+                        type="text" 
+                        value={inputs.location}
+                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-900 dark:text-white"
+                        placeholder="e.g. Glyfada, Athens"
+                      />
+                    </div>
+                    
+                    <div>
+                       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Owner Contact / Notes</label>
+                       <textarea 
+                          value={inputs.ownerNotes || ''}
+                          onChange={(e) => handleInputChange('ownerNotes', e.target.value)}
+                          className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm min-h-[60px] resize-none text-slate-900 dark:text-white"
+                          placeholder="Name, Phone, Comments..."
+                       />
+                    </div>
+
+                    {/* Google Map Embed */}
+                    <MapView location={inputs.location} />
+                  </div>
+                </div>
+
+                {/* Parameters Inputs */}
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Location / Area</label>
-                    <input 
-                      type="text" 
-                      value={inputs.location}
-                      onChange={(e) => handleInputChange('location', e.target.value)}
-                      className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-900 dark:text-white"
-                      placeholder="e.g. Glyfada, Athens"
+                  <div className="grid grid-cols-2 gap-4">
+                    <InputCard
+                      label="Plot Price"
+                      value={inputs.plotPrice}
+                      onChange={(val) => handleInputChange('plotPrice', val)}
+                      icon={Euro}
+                      unit="EUR"
+                      step={1000}
+                      action={
+                        <button onClick={handleEstimatePrice} disabled={isEstimatingPrice} className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded hover:bg-blue-100 transition-colors flex items-center gap-1">
+                          {isEstimatingPrice ? <div className="animate-spin w-2 h-2 border-2 border-blue-600 border-t-transparent rounded-full"></div> : <Wand2 size={10} />}
+                          Auto-Estimate
+                        </button>
+                      }
+                    />
+                    <InputCard
+                      label="Plot Size"
+                      value={inputs.plotSize}
+                      onChange={(val) => handleInputChange('plotSize', val)}
+                      icon={LandPlot}
+                      unit="m²"
+                      step={10}
                     />
                   </div>
-                  
-                  <div>
-                     <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Owner Contact / Notes</label>
-                     <textarea 
-                        value={inputs.ownerNotes || ''}
-                        onChange={(e) => handleInputChange('ownerNotes', e.target.value)}
-                        className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm min-h-[60px] resize-none text-slate-900 dark:text-white"
-                        placeholder="Name, Phone, Comments..."
-                     />
-                  </div>
 
-                  {/* Google Map Embed */}
-                  <MapView location={inputs.location} />
-                </div>
-              </div>
-
-              {/* Parameters Inputs */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <InputCard
-                    label="Plot Price"
-                    value={inputs.plotPrice}
-                    onChange={(val) => handleInputChange('plotPrice', val)}
-                    icon={Euro}
-                    unit="EUR"
-                    step={1000}
-                    action={
-                      <button onClick={handleEstimatePrice} disabled={isEstimatingPrice} className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded hover:bg-blue-100 transition-colors flex items-center gap-1">
-                        {isEstimatingPrice ? <div className="animate-spin w-2 h-2 border-2 border-blue-600 border-t-transparent rounded-full"></div> : <Wand2 size={10} />}
-                        Auto-Estimate
-                      </button>
-                    }
-                  />
-                  <InputCard
-                    label="Plot Size"
-                    value={inputs.plotSize}
-                    onChange={(val) => handleInputChange('plotSize', val)}
-                    icon={LandPlot}
-                    unit="m²"
-                    step={10}
-                  />
-                </div>
-
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                      <Scale size={18} />
-                      <label className="text-sm font-medium">Building Coefficient (Factor)</label>
+                  <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                        <Scale size={18} />
+                        <label className="text-sm font-medium">Building Coefficient (Factor)</label>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input 
-                      type="number" 
-                      value={inputs.buildingCoefficient} 
-                      onChange={(e) => handleInputChange('buildingCoefficient', parseFloat(e.target.value) || 0)}
-                      step={0.1} min={0.1} max={5.0}
-                      className="w-20 text-2xl font-bold bg-transparent outline-none text-slate-900 dark:text-white border-b-2 border-slate-200 focus:border-blue-500 text-center"
-                    />
-                    <span className="text-xs text-slate-400">Syntelesis Domisis (e.g. 0.8, 1.2)</span>
-                  </div>
-                  
-                  {/* Highlighted Max Buildable */}
-                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center bg-blue-50/50 dark:bg-blue-900/20 p-2 rounded-lg">
-                    <span className="text-xs font-bold text-blue-900 dark:text-blue-300">Max Buildable Area (Calculated)</span>
-                    <span className="text-lg font-extrabold text-blue-900 dark:text-blue-300">{Math.round(results.maxBuildableArea)} <span className="text-xs font-medium">m²</span></span>
-                  </div>
-                  <p className="text-[10px] text-slate-400 mt-1 text-center">{inputs.plotSize} m² x {inputs.buildingCoefficient} Factor</p>
-                </div>
-
-                {/* Financials Header */}
-                <h3 className="text-sm font-bold text-slate-500 flex items-center gap-2 mt-6">
-                  <Calculator size={16} /> Financials
-                </h3>
-
-                <InputCard
-                  label="Construction Cost (Hard)"
-                  value={inputs.constructionCostPerSqm}
-                  onChange={(val) => handleInputChange('constructionCostPerSqm', val)}
-                  icon={Hammer}
-                  unit="€/m²"
-                  step={50}
-                  helperText="Excluding plot price"
-                />
-
-                <InputCard
-                    label="Misc Costs Buffer"
-                    value={inputs.miscCostsPercent}
-                    onChange={(val) => handleInputChange('miscCostsPercent', val)}
-                    icon={Layers}
-                    unit="%"
-                    step={1}
-                    max={20}
-                    helperText="Taxes, notary, permits"
-                />
-                
-                <InputCard
-                  label="Target Sale Price"
-                  value={inputs.salePricePerSqm}
-                  onChange={(val) => handleInputChange('salePricePerSqm', val)}
-                  icon={TrendingUp}
-                  unit="€/m²"
-                  step={50}
-                  highlight
-                />
-              </div>
-            </div>
-
-            {/* --- RIGHT COLUMN: STATS & CHARTS --- */}
-            <div className="lg:col-span-8 space-y-6">
-              
-              {/* Key Stats Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <StatCard 
-                  label="Total Investment" 
-                  value={formatNumber(results.constructionCostTotalInclPlot)}
-                  subValue="Inc. Land & 5% Misc"
-                  icon={Euro}
-                  color="slate"
-                />
-                <StatCard 
-                  label="Potential Revenue" 
-                  value={formatNumber(results.revenueTotal)}
-                  subValue={`@ ${inputs.salePricePerSqm} /m²`}
-                  icon={TrendingUp}
-                  color="blue"
-                />
-                <StatCard 
-                  label="Net Profit" 
-                  value={formatNumber(results.profitTotal)}
-                  subValue={`${results.profitMargin.toFixed(1)}% Margin`}
-                  icon={Wallet}
-                  trend={results.profitTotal > 0 ? 'positive' : 'negative'}
-                  color={results.profitTotal > 0 ? 'green' : 'amber'}
-                />
-              </div>
-
-              {/* Analysis Tabs Container */}
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                <div className="border-b border-slate-100 dark:border-slate-700 px-6 py-3 flex gap-6 text-sm font-medium">
-                  <button className="text-blue-900 dark:text-blue-400 border-b-2 border-blue-900 dark:border-blue-400 pb-2.5 -mb-3.5">Visual Analysis</button>
-                  <button className="text-slate-500 hover:text-slate-800 pb-2.5">Cost Structure</button>
-                  <button className="text-slate-500 hover:text-slate-800 pb-2.5">Design Studio</button>
-                </div>
-                
-                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {/* Left Visual: Gauges */}
-                   <div className="space-y-4">
-                      <StrengthGauge margin={results.profitMargin} />
-                      <RiskBar margin={results.profitMargin} />
-                   </div>
-                   
-                   {/* Right Visual: Donuts/Charts */}
-                   <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
-                      <h4 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2"><Layers size={14}/> Expense Breakdown</h4>
-                      <div className="flex items-center justify-around h-32">
-                          <div className="text-center">
-                             <div className="relative w-16 h-16 rounded-full border-4 border-blue-900 flex items-center justify-center text-xs font-bold text-blue-900 mb-2">
-                               {Math.round((inputs.plotPrice / results.constructionCostTotalInclPlot) * 100)}%
-                             </div>
-                             <span className="text-[10px] uppercase font-bold text-slate-400">Plot</span>
-                          </div>
-                          <div className="text-center">
-                             <div className="relative w-16 h-16 rounded-full border-4 border-blue-600 flex items-center justify-center text-xs font-bold text-blue-600 mb-2">
-                               {Math.round((results.constructionCostTotal / results.constructionCostTotalInclPlot) * 100)}%
-                             </div>
-                             <span className="text-[10px] uppercase font-bold text-slate-400">Construction</span>
-                          </div>
-                          <div className="text-center">
-                             <div className="relative w-16 h-16 rounded-full border-4 border-slate-400 flex items-center justify-center text-xs font-bold text-slate-500 mb-2">
-                               {Math.round((results.miscCostsValue / results.constructionCostTotalInclPlot) * 100)}%
-                             </div>
-                             <span className="text-[10px] uppercase font-bold text-slate-400">Soft Costs</span>
-                          </div>
-                      </div>
-                   </div>
-                </div>
-
-                {/* Break-even Bar */}
-                <div className="px-6 pb-6">
-                   <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50">
-                      <div className="flex justify-between items-center mb-2">
-                         <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">Break-even Price</span>
-                         <span className="text-sm font-bold text-blue-900 dark:text-blue-300">{formatCurrency(results.costPerSqmInclPlot)} /m²</span>
-                      </div>
-                      <div className="h-3 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
-                         <div className="h-full bg-blue-900 dark:bg-blue-400" style={{ width: '60%' }}></div>
-                      </div>
-                      <div className="text-right mt-1">
-                         <span className="text-xs text-blue-600 dark:text-blue-400">Current margin safety: {results.profitMargin.toFixed(1)}%</span>
-                      </div>
-                   </div>
-                </div>
-
-                {/* Simple Bar Chart */}
-                <div className="px-6 pb-6 pt-0">
-                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Revenue vs Investment</h4>
-                    <div className="space-y-3">
-                        <div>
-                            <span className="text-xs font-medium text-slate-500 mb-1 block">Total Cost</span>
-                            <div className="h-8 bg-slate-500 rounded-md relative flex items-center px-3 text-white text-xs font-bold" style={{ width: '65%' }}></div>
-                        </div>
-                        <div>
-                            <span className="text-xs font-medium text-slate-500 mb-1 block">Revenue</span>
-                            <div className="h-8 bg-emerald-500 rounded-md relative flex items-center px-3 text-white text-xs font-bold" style={{ width: '100%' }}></div>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-                        <div className="text-center">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase">Constr. Cost</p>
-                            <p className="font-bold text-slate-800 dark:text-white">{formatNumber(results.constructionCostTotal)}</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase">Total Cost/m²</p>
-                            <p className="font-bold text-slate-800 dark:text-white">{formatNumber(results.costPerSqmInclPlot)}</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase">ROI</p>
-                            <p className="font-bold text-emerald-600">{results.roi.toFixed(1)}%</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase">Margin</p>
-                            <p className="font-bold text-emerald-600">{results.profitMargin.toFixed(1)}%</p>
-                        </div>
-                    </div>
-                </div>
-              </div>
-
-              {/* AI Consultant */}
-              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/50 rounded-2xl border border-indigo-100 dark:border-slate-700 p-6 relative overflow-hidden">
-                <div className="flex justify-between items-start mb-4 relative z-10">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="text-indigo-600 dark:text-indigo-400" size={20} />
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Gemini AI Investment Consultant</h3>
+                      <input 
+                        type="number" 
+                        value={inputs.buildingCoefficient} 
+                        onChange={(e) => handleInputChange('buildingCoefficient', parseFloat(e.target.value) || 0)}
+                        step={0.1} min={0.1} max={5.0}
+                        className="w-20 text-2xl font-bold bg-transparent outline-none text-slate-900 dark:text-white border-b-2 border-slate-200 focus:border-blue-500 text-center"
+                      />
+                      <span className="text-xs text-slate-400">Syntelesis Domisis (e.g. 0.8, 1.2)</span>
                     </div>
-                    <button
-                      onClick={handleGenerateAI}
-                      disabled={aiState.loading}
-                      className="bg-indigo-900 hover:bg-indigo-800 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
-                    >
-                      {aiState.loading ? 'Analyzing...' : 'Analyze Investment'}
-                    </button>
-                </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 max-w-2xl relative z-10">
-                    Get an instant professional opinion on this project's viability in the Greek market.
-                </p>
-                {aiState.error && (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg p-3 text-xs text-red-800 dark:text-red-200 mb-4 relative z-10">
-                       <p className="font-bold">Error: {aiState.error}</p>
+                    
+                    {/* Highlighted Max Buildable */}
+                    <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center bg-blue-50/50 dark:bg-blue-900/20 p-2 rounded-lg">
+                      <span className="text-xs font-bold text-blue-900 dark:text-blue-300">Max Buildable Area (Calculated)</span>
+                      <span className="text-lg font-extrabold text-blue-900 dark:text-blue-300">{Math.round(results.maxBuildableArea)} <span className="text-xs font-medium">m²</span></span>
                     </div>
-                )}
-                {aiState.content && (
-                    <div className="bg-white/80 dark:bg-slate-900/80 rounded-lg p-4 text-sm text-slate-800 dark:text-slate-200 border border-indigo-100 dark:border-slate-700 relative z-10 whitespace-pre-wrap">
-                       {aiState.content}
-                    </div>
-                )}
-                {/* Background Decor */}
-                <div className="absolute -bottom-4 -right-4 opacity-5 pointer-events-none">
-                  <Sparkles size={150} />
+                    <p className="text-[10px] text-slate-400 mt-1 text-center">{inputs.plotSize} m² x {inputs.buildingCoefficient} Factor</p>
+                  </div>
+
+                  {/* Financials Header */}
+                  <h3 className="text-sm font-bold text-slate-500 flex items-center gap-2 mt-6">
+                    <Calculator size={16} /> Financials
+                  </h3>
+
+                  <InputCard
+                    label="Construction Cost (Hard)"
+                    value={inputs.constructionCostPerSqm}
+                    onChange={(val) => handleInputChange('constructionCostPerSqm', val)}
+                    icon={Hammer}
+                    unit="€/m²"
+                    step={50}
+                    helperText="Excluding plot price"
+                  />
+
+                  <InputCard
+                      label="Misc Costs Buffer"
+                      value={inputs.miscCostsPercent}
+                      onChange={(val) => handleInputChange('miscCostsPercent', val)}
+                      icon={Layers}
+                      unit="%"
+                      step={1}
+                      max={20}
+                      helperText="Taxes, notary, permits"
+                  />
+                  
+                  <InputCard
+                    label="Target Sale Price"
+                    value={inputs.salePricePerSqm}
+                    onChange={(val) => handleInputChange('salePricePerSqm', val)}
+                    icon={TrendingUp}
+                    unit="€/m²"
+                    step={50}
+                    highlight
+                  />
                 </div>
               </div>
 
+              {/* --- RIGHT COLUMN: STATS & CHARTS --- */}
+              <div className="lg:col-span-8 space-y-6">
+                
+                {/* Key Stats Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <StatCard 
+                    label="Total Investment" 
+                    value={formatNumber(results.constructionCostTotalInclPlot)}
+                    subValue="Inc. Land & 5% Misc"
+                    icon={Euro}
+                    color="slate"
+                  />
+                  <StatCard 
+                    label="Potential Revenue" 
+                    value={formatNumber(results.revenueTotal)}
+                    subValue={`@ ${inputs.salePricePerSqm} /m²`}
+                    icon={TrendingUp}
+                    color="blue"
+                  />
+                  <StatCard 
+                    label="Net Profit" 
+                    value={formatNumber(results.profitTotal)}
+                    subValue={`${results.profitMargin.toFixed(1)}% Margin`}
+                    icon={Wallet}
+                    trend={results.profitTotal > 0 ? 'positive' : 'negative'}
+                    color={results.profitTotal > 0 ? 'green' : 'amber'}
+                  />
+                </div>
+
+                {/* Analysis Tabs Container */}
+                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                  <div className="border-b border-slate-100 dark:border-slate-700 px-6 py-3 flex gap-6 text-sm font-medium">
+                    <button className="text-blue-900 dark:text-blue-400 border-b-2 border-blue-900 dark:border-blue-400 pb-2.5 -mb-3.5">Visual Analysis</button>
+                    <button className="text-slate-500 hover:text-slate-800 pb-2.5">Cost Structure</button>
+                    <button className="text-slate-500 hover:text-slate-800 pb-2.5">Design Studio</button>
+                  </div>
+                  
+                  <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                     {/* Left Visual: Gauges */}
+                     <div className="space-y-4">
+                        <StrengthGauge margin={results.profitMargin} />
+                        <RiskBar margin={results.profitMargin} />
+                     </div>
+                     
+                     {/* Right Visual: Donuts/Charts */}
+                     <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <h4 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2"><Layers size={14}/> Expense Breakdown</h4>
+                        <div className="flex items-center justify-around h-32">
+                            <div className="text-center">
+                               <div className="relative w-16 h-16 rounded-full border-4 border-blue-900 flex items-center justify-center text-xs font-bold text-blue-900 mb-2">
+                                 {Math.round((inputs.plotPrice / results.constructionCostTotalInclPlot) * 100)}%
+                               </div>
+                               <span className="text-[10px] uppercase font-bold text-slate-400">Plot</span>
+                            </div>
+                            <div className="text-center">
+                               <div className="relative w-16 h-16 rounded-full border-4 border-blue-600 flex items-center justify-center text-xs font-bold text-blue-600 mb-2">
+                                 {Math.round((results.constructionCostTotal / results.constructionCostTotalInclPlot) * 100)}%
+                               </div>
+                               <span className="text-[10px] uppercase font-bold text-slate-400">Construction</span>
+                            </div>
+                            <div className="text-center">
+                               <div className="relative w-16 h-16 rounded-full border-4 border-slate-400 flex items-center justify-center text-xs font-bold text-slate-500 mb-2">
+                                 {Math.round((results.miscCostsValue / results.constructionCostTotalInclPlot) * 100)}%
+                               </div>
+                               <span className="text-[10px] uppercase font-bold text-slate-400">Soft Costs</span>
+                            </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  {/* Break-even Bar */}
+                  <div className="px-6 pb-6">
+                     <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50">
+                        <div className="flex justify-between items-center mb-2">
+                           <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">Break-even Price</span>
+                           <span className="text-sm font-bold text-blue-900 dark:text-blue-300">{formatCurrency(results.costPerSqmInclPlot)} /m²</span>
+                        </div>
+                        <div className="h-3 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
+                           <div className="h-full bg-blue-900 dark:bg-blue-400" style={{ width: '60%' }}></div>
+                        </div>
+                        <div className="text-right mt-1">
+                           <span className="text-xs text-blue-600 dark:text-blue-400">Current margin safety: {results.profitMargin.toFixed(1)}%</span>
+                        </div>
+                     </div>
+                  </div>
+
+                  {/* Simple Bar Chart */}
+                  <div className="px-6 pb-6 pt-0">
+                      <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Revenue vs Investment</h4>
+                      <div className="space-y-3">
+                          <div>
+                              <span className="text-xs font-medium text-slate-500 mb-1 block">Total Cost</span>
+                              <div className="h-8 bg-slate-500 rounded-md relative flex items-center px-3 text-white text-xs font-bold" style={{ width: '65%' }}></div>
+                          </div>
+                          <div>
+                              <span className="text-xs font-medium text-slate-500 mb-1 block">Revenue</span>
+                              <div className="h-8 bg-emerald-500 rounded-md relative flex items-center px-3 text-white text-xs font-bold" style={{ width: '100%' }}></div>
+                          </div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                          <div className="text-center">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase">Constr. Cost</p>
+                              <p className="font-bold text-slate-800 dark:text-white">{formatNumber(results.constructionCostTotal)}</p>
+                          </div>
+                          <div className="text-center">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase">Total Cost/m²</p>
+                              <p className="font-bold text-slate-800 dark:text-white">{formatNumber(results.costPerSqmInclPlot)}</p>
+                          </div>
+                          <div className="text-center">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase">ROI</p>
+                              <p className="font-bold text-emerald-600">{results.roi.toFixed(1)}%</p>
+                          </div>
+                          <div className="text-center">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase">Margin</p>
+                              <p className="font-bold text-emerald-600">{results.profitMargin.toFixed(1)}%</p>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+
+                {/* AI Consultant */}
+                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/50 rounded-2xl border border-indigo-100 dark:border-slate-700 p-6 relative overflow-hidden">
+                  <div className="flex justify-between items-start mb-4 relative z-10">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="text-indigo-600 dark:text-indigo-400" size={20} />
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Gemini AI Investment Consultant</h3>
+                      </div>
+                      <button
+                        onClick={handleGenerateAI}
+                        disabled={aiState.loading}
+                        className="bg-indigo-900 hover:bg-indigo-800 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
+                      >
+                        {aiState.loading ? 'Analyzing...' : 'Analyze Investment'}
+                      </button>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 max-w-2xl relative z-10">
+                      Get an instant professional opinion on this project's viability in the Greek market.
+                  </p>
+                  {aiState.error && (
+                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg p-3 text-xs text-red-800 dark:text-red-200 mb-4 relative z-10">
+                         <p className="font-bold">Error: {aiState.error}</p>
+                      </div>
+                  )}
+                  {aiState.content && (
+                      <div className="bg-white/80 dark:bg-slate-900/80 rounded-lg p-4 text-sm text-slate-800 dark:text-slate-200 border border-indigo-100 dark:border-slate-700 relative z-10 whitespace-pre-wrap">
+                         {aiState.content}
+                      </div>
+                  )}
+                  {/* Background Decor */}
+                  <div className="absolute -bottom-4 -right-4 opacity-5 pointer-events-none">
+                    <Sparkles size={150} />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* --- SAVED PROJECTS DASHBOARD (Moved from Tab to Main Page) --- */}
+            <div className="pt-8 border-t border-slate-200 dark:border-slate-700">
+               <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-3">
+                     <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg"><FolderOpen size={24} /></div>
+                     <div>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Saved Projects Dashboard</h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Manage and compare your investment scenarios</p>
+                     </div>
+                  </div>
+                  <div className="text-sm font-medium text-slate-500">{savedProjects.length} Records</div>
+               </div>
+
+               {isLoadingProjects ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                     <div className="animate-spin mb-3 text-blue-600"><RotateCcw size={24} /></div>
+                     <p>Loading projects...</p>
+                  </div>
+               ) : savedProjects.length === 0 ? (
+                  <div className="bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
+                     <p className="text-slate-500">No saved projects yet. Click "Save Project" to add one.</p>
+                  </div>
+               ) : (
+                  <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                     <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                           <thead>
+                              <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
+                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Project Name & Owner</th>
+                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Address / Location</th>
+                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total Investment</th>
+                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Potential Revenue</th>
+                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Net Profit</th>
+                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Strength</th>
+                                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Actions</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {savedProjects.map((project) => {
+                                 const metrics = calculateProjectMetrics(project.inputs);
+                                 const strength = getStrengthLabel(metrics.margin);
+                                 return (
+                                    <tr key={project.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
+                                       <td className="p-4">
+                                          <div className="font-bold text-slate-900 dark:text-white">{project.name}</div>
+                                          <div className="text-xs text-slate-500 truncate max-w-[150px]">{project.inputs.ownerNotes}</div>
+                                       </td>
+                                       <td className="p-4">
+                                          <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 text-sm">
+                                             <MapPin size={14} className="text-slate-400" />
+                                             {project.inputs.location}
+                                          </div>
+                                          <div className="text-xs text-slate-400 mt-1 pl-5">
+                                             {project.inputs.plotSize} m² • {formatNumber(project.inputs.plotPrice)} €
+                                          </div>
+                                       </td>
+                                       <td className="p-4 text-right font-medium text-slate-700 dark:text-slate-300">{formatNumber(metrics.totalInv)} €</td>
+                                       <td className="p-4 text-right font-medium text-blue-600 dark:text-blue-400">{formatNumber(metrics.revenue)} €</td>
+                                       <td className="p-4 text-right">
+                                          <div className={`font-bold ${metrics.profit > 0 ? 'text-slate-900 dark:text-white' : 'text-red-600'}`}>{formatNumber(metrics.profit)} €</div>
+                                          <div className="text-xs text-slate-500">{metrics.margin.toFixed(1)}% Margin</div>
+                                       </td>
+                                       <td className="p-4 text-center">
+                                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${strength.color}`}>
+                                             {strength.label}
+                                          </span>
+                                       </td>
+                                       <td className="p-4 text-center">
+                                          <div className="flex items-center justify-center gap-2">
+                                             <button onClick={() => handleLoadProject(project)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Load"><ArrowRight size={16} /></button>
+                                             <button onClick={(e) => handleDeleteClick(e, project.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
+                                          </div>
+                                       </td>
+                                    </tr>
+                                 );
+                              })}
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               )}
             </div>
           </div>
         )}
 
-        {activeTab === 'breakdown' && (
-          <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="flex justify-between items-center">
-                <div>
-                   <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Saved Projects Dashboard</h2>
-                   <p className="text-slate-500 dark:text-slate-400 mt-1">Manage and compare your investment scenarios</p>
-                </div>
-             </div>
-             {isLoadingProjects ? (
-                <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-                   <div className="animate-spin mb-4 text-blue-600"><RotateCcw size={32} /></div>
-                   <p>Loading projects...</p>
-                </div>
-             ) : savedProjects.length === 0 ? (
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
-                   <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400"><FolderOpen size={32} /></div>
-                   <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-1">No saved projects yet</h3>
-                   <p className="text-slate-500 mb-6">Start by calculating a new project and saving it.</p>
-                   <button onClick={() => setActiveTab('overview')} className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors">Create First Project</button>
-                </div>
-             ) : (
-                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                   <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
-                         <thead>
-                            <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
-                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Project Name</th>
-                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
-                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
-                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total Budget</th>
-                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Net Profit</th>
-                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Margin</th>
-                               <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Actions</th>
-                            </tr>
-                         </thead>
-                         <tbody>
-                            {savedProjects.map((project) => {
-                               const metrics = calculateProjectMetrics(project.inputs);
-                               return (
-                                  <tr key={project.id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group">
-                                     <td className="p-4"><div className="font-bold text-slate-900 dark:text-white">{project.name}</div></td>
-                                     <td className="p-4 text-slate-600 dark:text-slate-300 text-sm">{project.inputs.location}</td>
-                                     <td className="p-4 text-slate-500 text-sm">{new Date(project.createdAt).toLocaleDateString()}</td>
-                                     <td className="p-4 text-right font-medium text-slate-700 dark:text-slate-300">{formatNumber(metrics.totalInv)} €</td>
-                                     <td className={`p-4 text-right font-bold ${metrics.profit > 0 ? 'text-emerald-600' : 'text-amber-600'}`}>{formatNumber(metrics.profit)} €</td>
-                                     <td className="p-4 text-right"><span className={`inline-block px-2 py-1 rounded text-xs font-bold ${metrics.margin > 15 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{metrics.margin.toFixed(1)}%</span></td>
-                                     <td className="p-4 text-center">
-                                        <div className="flex items-center justify-center gap-2">
-                                           <button onClick={() => handleLoadProject(project)} className="p-2 text-slate-400 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 rounded-lg"><FolderOpen size={16} /></button>
-                                           <button onClick={(e) => handleDeleteClick(e, project.id)} className="p-2 text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
-                                        </div>
-                                     </td>
-                                  </tr>
-                               );
-                            })}
-                         </tbody>
-                      </table>
-                   </div>
-                </div>
-             )}
-          </div>
-        )}
-
-        {/* AI Design Tab Content (unchanged logic) */}
+        {/* AI Design Tab Content */}
         {activeTab === 'design' && (
            <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
