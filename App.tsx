@@ -579,7 +579,7 @@ const App: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Failed to estimate price", error);
-      if (error.message === "ENABLE_API_REQUIRED" || error.message === "API_KEY_RESTRICTED") {
+      if (error.message === "ENABLE_API_REQUIRED" || error.message === "API_KEY_RESTRICTED" || error.message === "API_KEY_LEAKED") {
         setNotification({ message: "API Service Blocked. See Analysis section.", type: 'error' });
         setAiState(prev => ({ ...prev, error: error.message }));
       } else {
@@ -630,7 +630,7 @@ const App: React.FC = () => {
     } catch (err: any) {
       let errorMsg = "Failed to generate design: " + err.message;
 
-      if (err.message === "ENABLE_API_REQUIRED" || err.message === "API_KEY_RESTRICTED") {
+      if (err.message === "ENABLE_API_REQUIRED" || err.message === "API_KEY_RESTRICTED" || err.message === "API_KEY_LEAKED") {
          errorMsg = "API Service Blocked. See Analysis section.";
          setAiState(prev => ({ ...prev, error: err.message }));
       }
@@ -1393,6 +1393,24 @@ const App: React.FC = () => {
                              Fix Key Permissions
                              <ExternalLink size={14} />
                            </a>
+                        </div>
+                     </div>
+                  </div>
+               ) : aiState.error === "API_KEY_LEAKED" ? (
+                  <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-xl border border-red-200 dark:border-red-800 animate-in fade-in slide-in-from-bottom-2">
+                     <div className="flex items-start gap-3">
+                        <div className="p-2 bg-red-100 dark:bg-red-800/50 rounded-full text-red-700 dark:text-red-400">
+                          <ShieldAlert size={20} />
+                        </div>
+                        <div>
+                           <h4 className="font-bold text-red-900 dark:text-red-100">API Key Blocked (Leaked)</h4>
+                           <p className="text-sm text-red-800 dark:text-red-300 mt-1 mb-3">
+                              Google detected the previous key in public code and blocked it. 
+                              We have automatically updated the app to use your secure Vercel key instead.
+                           </p>
+                           <div className="p-2 bg-white/50 dark:bg-black/20 rounded border border-red-100 dark:border-red-800 text-sm font-mono text-red-800 dark:text-red-200 mb-3">
+                              Please Redeploy your app on Vercel for the fix to take effect.
+                           </div>
                         </div>
                      </div>
                   </div>

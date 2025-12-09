@@ -8,10 +8,10 @@ export default defineConfig(({ mode }) => {
 
   // ------------------------------------------------------------------
   // INSTRUCTIONS:
-  // We have auto-detected your key from the firebase configuration.
-  // This ensures the app works immediately.
+  // We have removed the hardcoded key because it was flagged as leaked.
+  // The app will now exclusively use the API_KEY from Vercel Environment Variables.
   // ------------------------------------------------------------------
-  const HARDCODED_KEY = "AIzaSyAsoAmOPCduLxMCmxV7akQJDY9njmZSt2s"; 
+  const HARDCODED_KEY = ""; 
 
   // PRIORITIZE: Hardcoded -> Vercel System Var -> Local .env
   const apiKey = HARDCODED_KEY || process.env.API_KEY || env.API_KEY || '';

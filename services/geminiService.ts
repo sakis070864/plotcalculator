@@ -72,6 +72,11 @@ export const analyzeInvestment = async (
     if (errorMsg.includes("API_KEY_SERVICE_BLOCKED")) {
       throw new Error("API_KEY_RESTRICTED");
     }
+    
+    // Check for "Key Leaked"
+    if (errorMsg.includes("reported as leaked")) {
+      throw new Error("API_KEY_LEAKED");
+    }
 
     throw new Error(error.message || "Failed to generate AI analysis.");
   }
@@ -120,6 +125,10 @@ export const estimatePlotPrice = async (
 
     if (errorMsg.includes("API_KEY_SERVICE_BLOCKED")) {
       throw new Error("API_KEY_RESTRICTED");
+    }
+    
+    if (errorMsg.includes("reported as leaked")) {
+      throw new Error("API_KEY_LEAKED");
     }
 
     throw new Error(error.message || "Failed to estimate price.");
@@ -172,6 +181,10 @@ export const generateDesignVisualization = async (
 
     if (errorMsg.includes("API_KEY_SERVICE_BLOCKED")) {
       throw new Error("API_KEY_RESTRICTED");
+    }
+    
+    if (errorMsg.includes("reported as leaked")) {
+      throw new Error("API_KEY_LEAKED");
     }
 
     throw new Error(error.message || "Failed to generate design.");
